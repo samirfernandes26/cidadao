@@ -6,31 +6,13 @@ import { s } from "./styled";
 
 export default function LoginIndex() {
   const [showPass, setShowPass] = useState(false);
-  const [usuarioError, setUsuarioError] = useState("");
-  const [senhaError, setSenhaError] = useState("");
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const f = new FormData(e.currentTarget);
-    const usuario = String(f.get("usuario") || "");
-    const senha = String(f.get("senha") || "");
-    let erro = false;
-    if (!usuario) {
-      setUsuarioError("Por favor, preencha o campo de usuário ou CNS.");
-      erro = true;
-    } else {
-      setUsuarioError("");
-    }
-    if (!senha) {
-      setSenhaError("Por favor, preencha o campo de senha.");
-      erro = true;
-    } else {
-      setSenhaError("");
-    }
-    if (erro) return;
     console.log({
-      usuario,
-      senha,
+      usuario: String(f.get("usuario") || ""),
+      senha: String(f.get("senha") || ""),
     });
   }
 
@@ -58,22 +40,17 @@ export default function LoginIndex() {
             type="text"
             placeholder="Digite seu usuário ou CNS"
             autoComplete="username"
+            required
             className={s.input}
-            aria-invalid={!!usuarioError}
           />
-          {usuarioError && (
-            <div style={{ color: "#e67e22", fontSize: 12, marginTop: 1 }}>
-              {usuarioError}
-            </div>
-          )}
           <div>
             <input
               name="senha"
               type={showPass ? "text" : "password"}
               placeholder="Digite sua senha"
               autoComplete="current-password"
+              required
               className={s.input}
-              aria-invalid={!!senhaError}
               // minLength={6}
             />
             <button
@@ -83,11 +60,6 @@ export default function LoginIndex() {
             >
               {showPass ? "Ocultar senha" : "Mostrar senha"}
             </button>
-            {senhaError && (
-              <div style={{ color: "#e67e22", fontSize: 12, marginTop: 1 }}>
-                {senhaError}
-              </div>
-            )}
           </div>
 
           <div className="flex items-center justify-end">
