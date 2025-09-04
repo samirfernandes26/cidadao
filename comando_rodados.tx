@@ -1,0 +1,13 @@
+cd ~/cidadao-teste
+nano .env.local
+
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=COLE_AQUI_UMA_CHAVE_BEM_GRANDE
+VERSA_API_BASE_URL=https://api.versasaude.exemplo
+------------------------------------------------------------------
+
+Como gerar a chave NEXTAUTH_SECRET
+
+Use um dos comandos abaixo e copie o resultado:
+
+openssl rand -hex 32

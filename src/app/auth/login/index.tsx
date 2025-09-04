@@ -2,18 +2,48 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { s } from "./styled";
 
 export default function LoginIndex() {
+  const router = useRouter();
+  const params = useSearchParams();
   const [showPass, setShowPass] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
 
-  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const f = new FormData(e.currentTarget);
-    console.log({
-      usuario: String(f.get("usuario") || ""),
-      senha: String(f.get("senha") || ""),
-    });
+    setErr(null);
+    setLoading(true);
+
+    const form = new FormData(e.currentTarget);
+    const usuario = String(form.get("usuario") || "");
+    const senha = String(form.get("senha") || "");
+
+    try {
+      const rest = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ usuario, senha }),
+      });
+
+      if (rest.ok) {
+        const to = "/dashboard";
+        router.push(to);
+        return;
+      }
+
+      if (rest.status === 401) {
+        setErr("Credenciais inválidas. Tente novamente.");
+      } else {
+        setErr("Ocorreu um erro. Por favor, tente novamente mais tarde.");
+      }
+    } catch {
+      setErr("Ocorreu um erro. Por favor, tente novamente mais tarde.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -51,7 +81,6 @@ export default function LoginIndex() {
               autoComplete="current-password"
               required
               className={s.input}
-              // minLength={6}
             />
             <button
               type="button"
@@ -62,16 +91,19 @@ export default function LoginIndex() {
             </button>
           </div>
 
+          {err && <p className="text-sm text-red-600">{err}</p>}
+
           <div className="flex items-center justify-end">
             <Link href="#" className={s.forgot}>
               Esqueceu sua senha?
             </Link>
           </div>
 
-          <button type="submit" className={s.submit}>
-            Login
+          <button type="submit" className={s.submit} disabled={loading}>
+            {loading ? "Entrando..." : "Login"}
           </button>
         </form>
+
         {/* 
         <iframe
           className={s.iframeVideo}
