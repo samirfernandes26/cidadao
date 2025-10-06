@@ -29,7 +29,7 @@ export default function LoginIndex() {
       });
 
       if (rest.ok) {
-        const to = "/dashboard";
+        const to = "/listaMarcaoes";
         router.push(to);
         return;
       }

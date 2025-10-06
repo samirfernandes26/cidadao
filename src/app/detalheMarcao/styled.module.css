@@ -1,35 +1,93 @@
 .container {
-  max-width: 900px;
+  max-width: 1100px;
   margin: 0 auto;
-  padding: 1.5rem;
+  padding: 1.25rem;
   background: #fff;
   border-radius: 1.5rem;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
+@media (min-width: 640px) {
+  .container {
+    padding: 1.5rem;
+  }
+}
+@media (min-width: 1024px) {
+  .container {
+    padding: 2rem;
+  }
+}
+
+/* ===== Section ===== */
 .section {
   border: 1px solid #e2e8f0; /* slate-200 */
   border-radius: 1rem;
   margin-top: 1rem;
   overflow: hidden;
 }
-
 .sectionHeader {
   border-bottom: 1px solid #e2e8f0;
   padding: 0.75rem 1rem;
   font-size: 1.125rem;
   font-weight: 600;
-  color: #1e293b; /* slate-800 */
+  color: #1e293b;
 }
-
 .sectionContent {
   padding: 1rem;
 }
 
-.labeled {
-  margin-bottom: 0.75rem;
+/* ===== Grids responsivos ===== */
+.gridBasic {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+}
+@media (min-width: 768px) {
+  /* md */
+  .gridBasic {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1024px) {
+  /* lg */
+  .gridBasic {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
+.gridTwo {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 768px) {
+  /* md */
+  .gridTwo {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.gridStatus {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 640px) {
+  /* sm */
+  .gridStatus {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* faz um item ocupar a linha inteira nas grades acima */
+.colSpan2 {
+  grid-column: 1 / -1;
+}
+
+/* ===== Labeled ===== */
+.labeled {
+  margin-bottom: 0.25rem;
+}
 .labeledLabel {
   display: block;
   font-size: 0.8rem;
@@ -37,12 +95,12 @@
   color: #64748b; /* slate-500 */
   margin-bottom: 0.25rem;
 }
-
 .labeledValue {
   font-size: 0.95rem;
   color: #1e293b; /* slate-800 */
 }
 
+/* ===== Badges ===== */
 .badge {
   display: inline-flex;
   padding: 0.25rem 0.5rem;
@@ -51,26 +109,23 @@
   border: 1px solid;
   font-weight: 500;
 }
-
-/* Cores específicas */
 .badgeRisco {
   background: #fef3c7; /* amber-100 */
-  border-color: #fde68a; /* amber-200 */
-  color: #b45309; /* amber-700 */
+  border-color: #fde68a;
+  color: #b45309;
 }
-
 .badgeStatus {
   background: #e0e7ff; /* indigo-100 */
-  border-color: #c7d2fe; /* indigo-200 */
-  color: #3730a3; /* indigo-700 */
+  border-color: #c7d2fe;
+  color: #3730a3;
 }
 
+/* ===== Others ===== */
 .address {
   font-size: 0.9rem;
   color: #1e293b;
   white-space: pre-line;
 }
-
 .contacts {
   font-size: 0.9rem;
   color: #1e293b;
@@ -78,7 +133,6 @@
   flex-direction: column;
   gap: 0.25rem;
 }
-
 .empty {
   color: #64748b; /* slate-500 */
   font-size: 0.9rem;

@@ -3,7 +3,7 @@ import type { Marcacao, Endereco, Contato } from "@/models/marcacao";
 import styles from "./styled.module.css";
 
 type Props = {
-  marcacao: Marcacao; // você vai passar a marcação inteira por parâmetro
+  marcacao: Marcacao;
 };
 
 export default function MarcacaoDetalhe({ marcacao }: Props) {
@@ -14,65 +14,82 @@ export default function MarcacaoDetalhe({ marcacao }: Props) {
 
   return (
     <div className={styles.container}>
-      <h1>Detalhes da Marcação</h1>
-      <p>Agendamento ID: {marcacao.agendamento_id}</p>
+      <h1>Detalhes da Marcação: {marcacao.agendamento_id}</h1>
 
-      {/* Informações Básicas */}
+      {/* Informações Básicas (1 col no mobile, 2 no tablet, 3 no desktop) */}
       <Section title="Informações Básicas">
-        <Labeled label="Data de Inclusão">
-          <span className={styles.labeledValue}>{dataInclusao}</span>
-        </Labeled>
+        <div className={styles.gridBasic}>
+          <Labeled label="Data de Inclusão">
+            <span className={styles.labeledValue}>{dataInclusao}</span>
+          </Labeled>
 
-        <Labeled label="Data do Agendamento">
-          <span className={styles.labeledValue}>{dataAgendamento ?? "—"}</span>
-        </Labeled>
+          <Labeled label="Data do Agendamento">
+            <span className={styles.labeledValue}>
+              {dataAgendamento ?? "—"}
+            </span>
+          </Labeled>
 
-        <Labeled label="Risco">
-          <Badge type="risco">{marcacao.classificacao_de_risco}</Badge>
-        </Labeled>
+          <Labeled label="Risco">
+            <Badge type="risco">{marcacao.classificacao_de_risco}</Badge>
+          </Labeled>
 
-        <Labeled label="Status">
-          <Badge type="status">{marcacao.status_marcacao}</Badge>
-        </Labeled>
+          <Labeled label="Status">
+            <Badge type="status">{marcacao.status_marcacao}</Badge>
+          </Labeled>
 
-        <Labeled label="Posição na Fila">
-          <span className={styles.labeledValue}>
-            {marcacao.posicao_na_fila ?? "—"}
-          </span>
-        </Labeled>
+          <Labeled label="Posição na Fila">
+            <span className={styles.labeledValue}>
+              {marcacao.posicao_na_fila ?? "—"}
+            </span>
+          </Labeled>
+        </div>
       </Section>
 
-      {/* UBS Solicitante */}
+      {/* UBS Solicitante (1 col no mobile, 2 col >= md; endereço ocupa linha toda) */}
       <Section title="UBS Solicitante">
-        <Labeled label="Nome">
-          <span className={styles.labeledValue}>
-            {marcacao.ubs_solicitante?.nome ?? "—"}
-          </span>
-        </Labeled>
+        <div className={styles.gridTwo}>
+          <Labeled label="Nome">
+            <span className={styles.labeledValue}>
+              {marcacao.ubs_solicitante?.nome ?? "—"}
+            </span>
+          </Labeled>
 
-        <Labeled label="Endereço">
-          <AddressView endereco={marcacao.ubs_solicitante?.endereco ?? null} />
-        </Labeled>
+          <Labeled label="Contato">
+            <ContactsView contato={marcacao.ubs_solicitante?.contato ?? null} />
+          </Labeled>
 
-        <Labeled label="Contato">
-          <ContactsView contato={marcacao.ubs_solicitante?.contato ?? null} />
-        </Labeled>
+          <div className={styles.colSpan2}>
+            <Labeled label="Endereço">
+              <AddressView
+                endereco={marcacao.ubs_solicitante?.endereco ?? null}
+              />
+            </Labeled>
+          </div>
+        </div>
       </Section>
 
-      {/* Prestador de Serviço */}
+      {/* Status (lado a lado em telas médias) */}
+      <Section title="Status da Marcação">
+        <div className={styles.gridStatus}>
+          <Labeled label="Status">
+            <Badge type="status">{marcacao.status_marcacao}</Badge>
+          </Labeled>
+          <Labeled label="Posição na Fila">
+            <span className={styles.labeledValue}>
+              {marcacao.posicao_na_fila ?? "—"}
+            </span>
+          </Labeled>
+        </div>
+      </Section>
+
+      {/* Prestador de Serviço (mesma responsividade da UBS) */}
       <Section title="Prestador de Serviço">
         {marcacao.prestador_servico ? (
-          <>
+          <div className={styles.gridTwo}>
             <Labeled label="Nome">
               <span className={styles.labeledValue}>
                 {marcacao.prestador_servico?.nome}
               </span>
-            </Labeled>
-
-            <Labeled label="Endereço">
-              <AddressView
-                endereco={marcacao.prestador_servico?.endereco ?? null}
-              />
             </Labeled>
 
             <Labeled label="Contato">
@@ -80,7 +97,15 @@ export default function MarcacaoDetalhe({ marcacao }: Props) {
                 contato={marcacao.prestador_servico?.contato ?? null}
               />
             </Labeled>
-          </>
+
+            <div className={styles.colSpan2}>
+              <Labeled label="Endereço">
+                <AddressView
+                  endereco={marcacao.prestador_servico?.endereco ?? null}
+                />
+              </Labeled>
+            </div>
+          </div>
         ) : (
           <span className={styles.empty}>Não informado</span>
         )}
@@ -104,7 +129,7 @@ export default function MarcacaoDetalhe({ marcacao }: Props) {
   );
 }
 
-/* ================= helpers visuais (usam apenas classes CSS) ================= */
+/* ================= helpers visuais ================= */
 
 function Section({
   title,
@@ -124,12 +149,14 @@ function Section({
 function Labeled({
   label,
   children,
+  className,
 }: {
   label: string;
   children: React.ReactNode;
+  className?: string;
 }) {
   return (
-    <div className={styles.labeled}>
+    <div className={`${styles.labeled} ${className ?? ""}`}>
       <span className={styles.labeledLabel}>{label}</span>
       {children}
     </div>
@@ -175,7 +202,6 @@ function ContactsView({ contato }: { contato: Contato | null }) {
 
 /* ============ utils ============ */
 function safeFormat(input: string) {
-  // tenta formatar ISO-8601 e strings comuns; se falhar, retorna como veio
   try {
     const d = new Date(input);
     if (!isNaN(d.getTime())) {
