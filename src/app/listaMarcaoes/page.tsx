@@ -1,5 +1,5 @@
 // src/app/dashboard/page.tsx
-import ProcedimentoCard from "@/components/ProcedimentoCard";
+import ProcedimentoCard from "@/components/ProcedimentoCardCss";
 import type { Marcacao } from "@/models/marcacao";
 import marcacoesMock from "./marcacoes.mock";
 
@@ -25,9 +25,9 @@ function toCardData(m: Marcacao): Procedimento {
   let statusLinha1: string = m.status_marcacao;
 
   if (m.status_marcacao === "Aguardando" && m.posicao_na_fila != null) {
-    statusLinha1 = "Em fila";
+    statusLinha1 = "";
   } else if (m.status_marcacao === "Agendado" && m.data_agendamento) {
-    statusLinha1 = `Agendado em ${formatPtBR(m.data_agendamento)}`;
+    statusLinha1 = `Agendado para ${formatPtBR(m.data_agendamento)}`;
   }
 
   return {

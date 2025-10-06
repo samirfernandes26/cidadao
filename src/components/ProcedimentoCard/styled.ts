@@ -37,8 +37,8 @@ export const s = {
 
 // Cores do badge por nível de risco
 export const riskBadgeColors: Record<RiscoLevel, string> = {
-  Baixo: "bg-emerald-100 text-emerald-800 ring-emerald-300",
-  Moderado: "bg-yellow-100 text-yellow-900 ring-yellow-300",
-  Alto: "bg-orange-100 text-orange-900 ring-orange-300",
-  Crítico: "bg-red-100 text-red-800 ring-red-300",
+  Baixo: "bg-emerald-100 text-emerald-800 ",
+  Moderado: "bg-yellow-100 text-yellow-900 ",
+  Alto: "bg-orange-100 text-orange-900 ",
+  Crítico: "bg-red-100 text-red-800 ",
 };

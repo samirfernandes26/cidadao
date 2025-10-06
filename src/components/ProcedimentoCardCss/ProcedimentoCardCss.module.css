@@ -17,16 +17,16 @@
   --emerald-800: #065f46;
 
   --yellow-100: #fef9c3;
-  --yellow-300: #fde68a;
-  --yellow-900: #713f12;
+  --yellow-300: #f5cf39;
+  --yellow-900: #fd8300;
 
   --orange-100: #ffedd5;
   --orange-300: #fdba74;
-  --orange-900: #7c2d12;
+  --orange-900: #ca0000;
 
   --red-100: #fee2e2;
   --red-300: #fca5a5;
-  --red-800: #991b1b;
+  --red-800: #ff0000;
 }
 
 /* ==== Card ==== */
@@ -34,8 +34,11 @@
   position: relative;
   width: 100%;
   background: var(--c-white);
-  border: 1px solid var(--gray-200);
-  border-radius: 16px; /* ~rounded-2xl */
+  /* border: 2px solid rgba(51, 122, 183, 1); */
+  border-left: 4px solid rgba(51, 122, 183, 1);
+  border-bottom: 2px solid rgba(51, 122, 183, 1);
+  border-radius: 12px; /* ~rounded-2xl */
+
   padding: 16px; /* p-4 */
   box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); /* shadow-sm */
   transition: box-shadow 0.2s ease;
@@ -181,25 +184,17 @@
 
 /* Baixo */
 .riskBaixo {
-  background: var(--emerald-100);
   color: var(--emerald-800);
-  border-color: var(--emerald-300);
 }
 /* Moderado */
 .riskModerado {
-  background: var(--yellow-100);
   color: var(--yellow-900);
-  border-color: var(--yellow-300);
 }
 /* Alto */
 .riskAlto {
-  background: var(--orange-100);
   color: var(--orange-900);
-  border-color: var(--orange-300);
 }
 /* Crítico */
 .riskCritico {
-  background: var(--red-100);
   color: var(--red-800);
-  border-color: var(--red-300);
 }

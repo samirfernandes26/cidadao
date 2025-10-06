@@ -35,9 +35,7 @@ export default function ProcedimentoCard({
   const riskTone = riskClassByLabel[risco] ?? styles.riskModerado;
 
   const RiskBadge = (
-    <span className={`${styles.riskBadgeBase} ${riskTone}`}>
-      Risco: {risco}
-    </span>
+    <span className={`${styles.riskBadgeBase} ${riskTone}`}>C.R.: {risco}</span>
   );
 
   const CardInner = (
@@ -65,7 +63,7 @@ export default function ProcedimentoCard({
         <p className={styles.meta}>
           {statusLinha1}
           {typeof posicao === "number" ? (
-            <span> • Posição: {posicao}</span>
+            <span> Posição na fila: {posicao}</span>
           ) : null}
         </p>
 
