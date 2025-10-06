@@ -1,0 +1,205 @@
+/* ==== Tokens (cores/medidas) ==== */
+:root {
+  --c-white: #ffffff;
+
+  --gray-200: #e5e7eb;
+  --gray-700: #374151;
+  --gray-900: #111827;
+
+  --blue-50: #eff6ff;
+  --blue-200: #bfdbfe;
+  --blue-600: #2563eb;
+  --blue-700: #1d4ed8;
+
+  /* Riscos */
+  --emerald-100: #d1fae5;
+  --emerald-300: #6ee7b7;
+  --emerald-800: #065f46;
+
+  --yellow-100: #fef9c3;
+  --yellow-300: #fde68a;
+  --yellow-900: #713f12;
+
+  --orange-100: #ffedd5;
+  --orange-300: #fdba74;
+  --orange-900: #7c2d12;
+
+  --red-100: #fee2e2;
+  --red-300: #fca5a5;
+  --red-800: #991b1b;
+}
+
+/* ==== Card ==== */
+.article {
+  position: relative;
+  width: 100%;
+  background: var(--c-white);
+  border: 1px solid var(--gray-200);
+  border-radius: 16px; /* ~rounded-2xl */
+  padding: 16px; /* p-4 */
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); /* shadow-sm */
+  transition: box-shadow 0.2s ease;
+}
+
+.article:hover {
+  box-shadow: 0 10px 30px -10px rgb(0 0 0 / 0.2); /* hover:md */
+}
+
+.article:focus-within {
+  box-shadow: 0 0 0 2px var(--blue-600);
+  outline: none;
+}
+
+/* sm:p-5 */
+@media (min-width: 640px) {
+  .article {
+    padding: 20px;
+  }
+}
+
+/* ==== Layout interno ==== */
+.row {
+  display: flex;
+  flex-direction: row; /* seu componente atual já usa row direto */
+  gap: 12px; /* ~gap-3 */
+  align-items: flex-start;
+}
+
+.iconWrap {
+  display: flex;
+  height: 36px; /* h-9 */
+  width: 36px; /* w-9 */
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  border: 1px solid var(--blue-200);
+  color: var(--blue-600);
+  background: #fff;
+}
+
+.header {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.headerTop {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+@media (min-width: 640px) {
+  .headerTop {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.badgeWrap {
+  margin-left: 0;
+}
+@media (min-width: 640px) {
+  .badgeWrap {
+    margin-left: 12px;
+  }
+}
+
+.title {
+  font-size: 1.125rem; /* text-lg */
+  font-weight: 600;
+  color: var(--gray-900);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap; /* truncate */
+}
+
+.meta {
+  margin-top: 8px; /* mt-2 */
+  font-size: 0.875rem; /* text-sm */
+  color: var(--gray-700);
+}
+
+/* ==== Ação ==== */
+.action {
+  margin-top: 8px;
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .action {
+    position: absolute;
+    right: 16px; /* sm:right-4 */
+    bottom: 16px; /* sm:bottom-4 */
+    margin-top: 0;
+    width: auto;
+  }
+}
+
+/* Botão / Link */
+.btn {
+  display: inline-flex;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px; /* px-3 */
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--blue-700);
+  background: transparent;
+  border: 1px solid var(--blue-200);
+  border-radius: 8px; /* rounded-lg */
+  transition:
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+  text-decoration: none;
+}
+
+.btn:hover {
+  background: var(--blue-50); /* hover:bg-blue-50 */
+}
+
+.btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--blue-600);
+}
+
+/* ==== Badge de risco ==== */
+.riskBadgeBase {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px; /* py-1 px-2 */
+  font-size: 0.75rem; /* text-xs */
+  font-weight: 600; /* font-medium */
+  border-radius: 6px; /* rounded-md */
+  border: 1px solid transparent; /* simulando ring-inset via border */
+}
+
+/* Baixo */
+.riskBaixo {
+  background: var(--emerald-100);
+  color: var(--emerald-800);
+  border-color: var(--emerald-300);
+}
+/* Moderado */
+.riskModerado {
+  background: var(--yellow-100);
+  color: var(--yellow-900);
+  border-color: var(--yellow-300);
+}
+/* Alto */
+.riskAlto {
+  background: var(--orange-100);
+  color: var(--orange-900);
+  border-color: var(--orange-300);
+}
+/* Crítico */
+.riskCritico {
+  background: var(--red-100);
+  color: var(--red-800);
+  border-color: var(--red-300);
+}
