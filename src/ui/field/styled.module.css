@@ -1,0 +1,10 @@
+.labeled {
+  margin-bottom: 0.25rem;
+}
+.labeledLabel {
+  display: block;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  color: #64748b; /* slate-500 */
+  margin-bottom: 0.25rem;
+}

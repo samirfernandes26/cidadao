@@ -1,0 +1,21 @@
+.empty {
+  color: #64748b; /* slate-500 */
+  font-size: 0.9rem;
+}
+
+.gridTwo {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 768px) {
+  /* md */
+  .gridTwo {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.labeledValue {
+  font-size: 0.95rem;
+  color: #1e293b; /* slate-800 */
+}

@@ -1,0 +1,9 @@
+.empty {
+  color: #64748b; /* slate-500 */
+  font-size: 0.9rem;
+}
+
+.labeledValue {
+  font-size: 0.95rem;
+  color: #1e293b; /* slate-800 */
+}

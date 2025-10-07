@@ -1,6 +1,30 @@
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
+  // sessionStorage  Sempre apaga ao fechar o navegador
+
+  // localStorage Sempre persiste mesmo que o navegador seja fechado
+
+  // set get
+
+  // String, boolean, number
+
+  // ['usuario', 'senha'];
+
+  // {
+  //   teste: 'valor',
+  //   outro: 123,
+  //   ativo: true
+  // }
+
+  // JSON.stringify();
+
+  // JSON.parse();
+
+  // Criar hooks para context de autenticação, validando cookie e também session/local storage
+
+  // Criar middlware para proteger rotas
+
   try {
     const { usuario, senha } = await req.json();
 

@@ -1,0 +1,12 @@
+.empty {
+  color: #64748b; /* slate-500 */
+  font-size: 0.9rem;
+}
+
+.contacts {
+  font-size: 0.9rem;
+  color: #1e293b;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}

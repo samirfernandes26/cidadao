@@ -1,0 +1,19 @@
+/* ===== Badges ===== */
+.badge {
+  display: inline-flex;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  border-radius: 0.375rem;
+  border: 1px solid;
+  font-weight: 500;
+}
+.badgeRisco {
+  background: #fef3c7; /* amber-100 */
+  border-color: #fde68a;
+  color: #b45309;
+}
+.badgeStatus {
+  background: #e0e7ff; /* indigo-100 */
+  border-color: #c7d2fe;
+  color: #3730a3;
+}
