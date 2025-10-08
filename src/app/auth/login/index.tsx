@@ -3,11 +3,17 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { s } from "./styled";
+import styles from "./login.module.css";
+
+// ⬇️ importa o contexto/hook de auth
+import { useAuth } from "@/hooks/auth";
+import type { VersaUser } from "@/models/auth";
 
 export default function LoginIndex() {
   const router = useRouter();
   const params = useSearchParams();
+  const { login } = useAuth(); // ⬅️ vai salvar o user no sessionStorage + estado
+
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -22,23 +28,27 @@ export default function LoginIndex() {
     const senha = String(form.get("senha") || "");
 
     try {
-      const rest = await fetch("/api/login", {
+      const res = await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ usuario, senha }),
       });
 
-      if (rest.ok) {
-        const to = "/listaMarcaoes";
-        router.push(to);
+      if (res.ok) {
+        // espera que a rota /api/login retorne { ok: true, user: { ... } }
+        const body = (await res.json()) as { ok: true; user: VersaUser };
+        login(body.user); // ⬅️ guarda no sessionStorage e atualiza contexto
+
+        const next = params.get("next") || "/listaMarcacoes";
+        router.push(next);
         return;
       }
 
-      if (rest.status === 401) {
-        setErr("Credenciais inválidas. Tente novamente.");
-      } else {
-        setErr("Ocorreu um erro. Por favor, tente novamente mais tarde.");
-      }
+      setErr(
+        res.status === 401
+          ? "Credenciais inválidas. Tente novamente."
+          : "Ocorreu um erro. Por favor, tente novamente mais tarde."
+      );
     } catch {
       setErr("Ocorreu um erro. Por favor, tente novamente mais tarde.");
     } finally {
@@ -47,9 +57,9 @@ export default function LoginIndex() {
   }
 
   return (
-    <main className={s.page}>
-      <div className={s.card}>
-        <div className={s.iconWrap} aria-hidden>
+    <main className={styles.page}>
+      <div className={styles.card}>
+        <div className={styles.iconWrap} aria-hidden>
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
             <path
               d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm7 8a7 7 0 0 0-14 0"
@@ -61,54 +71,53 @@ export default function LoginIndex() {
           </svg>
         </div>
 
-        <h1 className={s.title}>Portal do Cidadão</h1>
-        <p className={s.subtitle}>Acesse sua conta para continuar.</p>
+        <h1 className={styles.title}>Portal do Cidadão</h1>
+        <p className={styles.subtitle}>Acesse sua conta para continuar.</p>
 
-        <form onSubmit={onSubmit} className="mt-6 space-y-3">
-          <input
-            name="usuario"
-            type="text"
-            placeholder="Digite seu usuário ou CNS"
-            autoComplete="username"
-            required
-            className={s.input}
-          />
-          <div>
+        <form onSubmit={onSubmit} className={styles.form} noValidate>
+          <label className={styles.label}>
+            <span className={styles.labelText}>Usuário ou CNS</span>
+            <input
+              name="usuario"
+              type="text"
+              placeholder="Digite seu usuário ou CNS"
+              autoComplete="username"
+              required
+              className={styles.input}
+            />
+          </label>
+
+          <label className={styles.label}>
+            <span className={styles.labelText}>Senha</span>
             <input
               name="senha"
               type={showPass ? "text" : "password"}
               placeholder="Digite sua senha"
               autoComplete="current-password"
               required
-              className={s.input}
+              className={styles.input}
             />
             <button
               type="button"
               onClick={() => setShowPass((v) => !v)}
-              className={s.showBtn}
+              className={styles.showBtn}
             >
               {showPass ? "Ocultar senha" : "Mostrar senha"}
             </button>
-          </div>
+          </label>
 
-          {err && <p className="text-sm text-red-600">{err}</p>}
+          {err && <p className={styles.error}>{err}</p>}
 
-          <div className="flex items-center justify-end">
-            <Link href="#" className={s.forgot}>
+          <div className={styles.forgotRow}>
+            <Link href="#" className={styles.forgot}>
               Esqueceu sua senha?
             </Link>
           </div>
 
-          <button type="submit" className={s.submit} disabled={loading}>
+          <button type="submit" className={styles.submit} disabled={loading}>
             {loading ? "Entrando..." : "Login"}
           </button>
         </form>
-
-        {/* 
-        <iframe
-          className={s.iframeVideo}
-          src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-        ></iframe> */}
       </div>
     </main>
   );

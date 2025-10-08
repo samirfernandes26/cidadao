@@ -17,6 +17,10 @@ export default function MarcacaoDetalhe({ marcacao }: { marcacao: Marcacao }) {
         <InformacoesBasicas marcacao={marcacao} />
       </Section>
 
+      <Section title="Procedimentos">
+        <Procedimentos itens={marcacao.procedimentos} />
+      </Section>
+
       <Section title="UBS Solicitante">
         <UbsSolicitante ubs={marcacao.ubs_solicitante ?? null} />
       </Section>
@@ -30,10 +34,6 @@ export default function MarcacaoDetalhe({ marcacao }: { marcacao: Marcacao }) {
 
       <Section title="Prestador de Serviço">
         <PrestadorServico prestador={marcacao.prestador_servico ?? null} />
-      </Section>
-
-      <Section title="Procedimentos">
-        <Procedimentos itens={marcacao.procedimentos} />
       </Section>
     </div>
   );

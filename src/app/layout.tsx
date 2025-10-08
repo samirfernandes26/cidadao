@@ -1,4 +1,5 @@
 // src/app/layout.tsx
+import { AuthProvider } from "@/hooks/auth";
 import "./globals.css";
 import { Inter } from "next/font/google";
 
@@ -14,7 +15,7 @@ export default function RootLayout({
       <body
         className={`${inter.className} min-h-screen bg-gray-50 antialiased`}
       >
-        {children}
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );
