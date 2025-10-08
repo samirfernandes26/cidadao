@@ -1,5 +1,5 @@
 /** Usuário retornado no login da Versa */
-export type VersaUser = {
+export type User = {
   cidadao_id: number;
   nome: string;
   cpf: string;
@@ -9,7 +9,7 @@ export type VersaUser = {
 
 export type VersaLoginRaw = {
   message: string;
-  user: VersaUser;
+  user: User;
   token: string;
   requires_password_change: boolean | 0 | 1;
   expires_at: string;
@@ -17,7 +17,7 @@ export type VersaLoginRaw = {
 
 export type AuthSession = {
   token: string;
-  user: VersaUser;
+  user: User;
   requiresPasswordChange: boolean;
   expiresAt: Date;
 };

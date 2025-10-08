@@ -1,68 +1,96 @@
 "use client";
 
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import type { VersaUser } from "@/models/auth";
+
 import {
   readUserFromSession,
   saveUserToSession,
   clearUserFromSession,
 } from "@/utils/browserSession";
 
+import { login as doLogin } from "@/services/auth/login";
+
+import type { User } from "@/models/auth";
+
 type Status = "loading" | "authenticated" | "unauthenticated";
 
 type AuthContextType = {
   status: Status;
-  user: VersaUser | null;
-  login: (user: VersaUser) => void;
+  user?: User;
+  requiresPasswordChange?: boolean;
+  login: (login: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   refresh: () => Promise<void>;
 };
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [status, setStatus] = useState<Status>("loading");
-  const [user, setUser] = useState<VersaUser | null>(null);
+  const [user, setUser] = useState<User>({} as User);
+  const [requiresPasswordChange, setRequiresPasswordChange] =
+    useState<boolean>(false);
 
   const refresh = async () => {
-    try {
-      const res = await fetch("/api/auth/session", { cache: "no-store" });
-      if (res.ok) {
-        setStatus("authenticated");
-      } else {
-        setStatus("unauthenticated");
-        setUser(null);
-        clearUserFromSession();
-      }
-    } catch {
-      setStatus("unauthenticated");
-      setUser(null);
-      clearUserFromSession();
+    // try {
+    //   const res = await fetch("/api/auth/session", { cache: "no-store" });
+    //   if (res.ok) {
+    //     setStatus("authenticated");
+    //   } else {
+    //     setStatus("unauthenticated");
+    //     setUser(null);
+    //     clearUserFromSession();
+    //   }
+    // } catch {
+    //   setStatus("unauthenticated");
+    //   setUser(null);
+    //   clearUserFromSession();
+    // }
+  };
+
+  async function login(login: string, password: string) {
+    const { type, message, user, requiresPasswordChange } = await doLogin(
+      login,
+      password
+    );
+
+    if (type === "success") {
+      sessionStorage.setItem("user_info", JSON.stringify(user));
+      sessionStorage.setItem(
+        "requires_password_change",
+        requiresPasswordChange ? "true" : "false"
+      );
+
+      setRequiresPasswordChange(!!requiresPasswordChange);
+      setUser(user!);
+      setStatus("authenticated");
     }
-  };
-
-  useEffect(() => {
-    setUser(readUserFromSession());
-    refresh();
-  }, []);
-
-  const login = (u: VersaUser) => {
-    saveUserToSession(u);
-    setUser(u);
-    setStatus("authenticated");
-  };
+  }
 
   const logout = async () => {
-    await fetch("/api/logout", { method: "POST" });
-    clearUserFromSession();
-    setUser(null);
-    setStatus("unauthenticated");
+    // await fetch("/api/logout", { method: "POST" });
+    // clearUserFromSession();
+    // setUser(null);
+    // setStatus("unauthenticated");
   };
 
   const value = useMemo(
-    () => ({ status, user, login, logout, refresh }),
-    [status, user]
+    () => ({ status, user, login, logout, refresh, requiresPasswordChange }),
+    [status, user, requiresPasswordChange]
   );
+
+  useEffect(() => {
+    const userInfo = sessionStorage.getItem("user_info");
+    const requiresPasswordChange = sessionStorage.getItem(
+      "requires_password_change"
+    );
+
+    if (!!userInfo) {
+      setUser(JSON.parse(userInfo));
+      setStatus("authenticated");
+      setRequiresPasswordChange(requiresPasswordChange === "true");
+    }
+  }, []);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

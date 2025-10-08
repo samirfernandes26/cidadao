@@ -1,23 +1,69 @@
-// src/services/auth/login.ts
-import type { VersaLoginRaw, AuthSession } from "@/models/auth";
-import { normalizeLoginResponse } from "@/models/auth";
+"use server";
 
-export async function versaLoginTyped(
-  login: string,
-  password: string
-): Promise<AuthSession> {
-  const base = process.env.VERSA_API_BASE_URL!;
-  const res = await fetch(`${base.replace(/\/$/, "")}/auth/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Accept: "application/json" },
-    body: JSON.stringify({ login, password }),
-  });
+import { cookies } from "next/headers";
+import axios, { HttpStatusCode } from "axios";
 
-  if (!res.ok) {
-    // trate 400/401/422 etc como quiser
-    throw new Error(`Login failed: ${res.status}`);
-  }
+import { User } from "@/models/auth";
 
-  const raw = (await res.json()) as VersaLoginRaw;
-  return normalizeLoginResponse(raw);
+interface LoginResponse {
+  token: string;
+  message: string;
+  requires_password_change: boolean;
+  expires_at: string; // ISO 8601
+  user: User;
 }
+
+interface IResponse {
+  type: "success" | "error";
+  message: string;
+  user?: User;
+  requiresPasswordChange?: boolean;
+}
+
+async function login(login: string, password: string): Promise<IResponse> {
+  const base = "https://teste1.versasaude.com.br/api";
+
+  try {
+    debugger;
+    await axios.get(`${base}/sanctum/csrf-cookie`);
+
+    const { data } = await axios.post<LoginResponse>(`${base}/cidadao/login`, {
+      login,
+      password,
+    });
+
+    const cookieStore = await cookies();
+
+    cookieStore.set("auth_token", data.token, {
+      path: "/",
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      expires: new Date(data.expires_at),
+    });
+
+    return {
+      type: "success",
+      message: data.message,
+      user: data.user,
+      requiresPasswordChange: data.requires_password_change,
+    };
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      if (err.status == HttpStatusCode.UnprocessableEntity) {
+        alert("Credenciais inválidas. Tente novamente.");
+      }
+
+      return {
+        type: "error",
+        message: "Usuário e/ou senha inválidos.",
+      };
+    }
+
+    return {
+      type: "error",
+      message: "Ocorreu um erro. Por favor, tente novamente mais tarde.",
+    };
+  }
+}
+
+export { login };

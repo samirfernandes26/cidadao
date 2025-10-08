@@ -29,7 +29,6 @@ const instituicao = (partial: Partial<Instituicao> = {}): Instituicao => ({
   contato: partial.contato ?? contato({}),
 });
 
-// ---- 10 marcações fictícias (tipadas) ----
 export const marcacoesMock: ApiListResponse<Marcacao> = {
   data: [
     {

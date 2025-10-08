@@ -1,22 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import styles from "./login.module.css";
 
 // ⬇️ importa o contexto/hook de auth
 import { useAuth } from "@/hooks/auth";
-import type { VersaUser } from "@/models/auth";
 
 export default function LoginIndex() {
   const router = useRouter();
   const params = useSearchParams();
-  const { login } = useAuth(); // ⬅️ vai salvar o user no sessionStorage + estado
+  const { login, user } = useAuth(); // ⬅️ vai salvar o user no sessionStorage + estado
 
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!!user?.cidadao_id) {
+      const next = params.get("next") || "/marcacoes";
+      router.push(next);
+    }
+  }, [user]);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -28,27 +34,26 @@ export default function LoginIndex() {
     const senha = String(form.get("senha") || "");
 
     try {
-      const res = await fetch("/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ usuario, senha }),
-      });
+      const response = await login(usuario, senha);
 
-      if (res.ok) {
-        // espera que a rota /api/login retorne { ok: true, user: { ... } }
-        const body = (await res.json()) as { ok: true; user: VersaUser };
-        login(body.user); // ⬅️ guarda no sessionStorage e atualiza contexto
-
-        const next = params.get("next") || "/listaMarcacoes";
-        router.push(next);
-        return;
-      }
-
-      setErr(
-        res.status === 401
-          ? "Credenciais inválidas. Tente novamente."
-          : "Ocorreu um erro. Por favor, tente novamente mais tarde."
-      );
+      // const res = await fetch("/api/login", {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify({ usuario, senha }),
+      // });
+      // if (res.ok) {
+      //   // espera que a rota /api/login retorne { ok: true, user: { ... } }
+      //   const body = (await res.json()) as { ok: true; user: VersaUser };
+      //   // login(body.user); // ⬅️ guarda no sessionStorage e atualiza contexto
+      // const next = params.get("next") || "/listaMarcacoes";
+      // router.push(next);
+      // return;
+      // }
+      // setErr(
+      //   res.status === 401
+      //     ? "Credenciais inválidas. Tente novamente."
+      //     : "Ocorreu um erro. Por favor, tente novamente mais tarde."
+      // );
     } catch {
       setErr("Ocorreu um erro. Por favor, tente novamente mais tarde.");
     } finally {
