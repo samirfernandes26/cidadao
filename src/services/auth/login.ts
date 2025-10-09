@@ -27,12 +27,23 @@ async function login(login: string, password: string): Promise<IResponse> {
     debugger;
     await axios.get(`${base}/sanctum/csrf-cookie`);
 
-    const { data } = await axios.post<LoginResponse>(`${base}/cidadao/login`, {
-      login,
-      password,
-    });
+    const { data, headers } = await axios.post<LoginResponse>(
+      `${base}/cidadao/login`,
+      {
+        login,
+        password,
+      }
+    );
 
     const cookieStore = await cookies();
+
+    headers["set-cookie"]?.forEach((cookieString) => {
+      const parts = cookieString.split(";");
+      const [name, value] = parts[0].split("=");
+
+      console.log(name, value);
+      cookieStore.set(name, value);
+    });
 
     cookieStore.set("auth_token", data.token, {
       path: "/",

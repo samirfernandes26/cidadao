@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import {
   readUserFromSession,
@@ -26,6 +27,7 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
   const [status, setStatus] = useState<Status>("loading");
   const [user, setUser] = useState<User>({} as User);
   const [requiresPasswordChange, setRequiresPasswordChange] =
@@ -91,6 +93,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setRequiresPasswordChange(requiresPasswordChange === "true");
     }
   }, []);
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      if (requiresPasswordChange) {
+        router.push("/auth/atualizar-senha");
+      }
+    }
+  }, [status, requiresPasswordChange, router]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
