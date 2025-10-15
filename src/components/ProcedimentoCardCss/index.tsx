@@ -35,7 +35,10 @@ export default function ProcedimentoCard({
   const riskTone = riskClassByLabel[risco] ?? styles.riskModerado;
 
   const RiskBadge = (
-    <span className={`${styles.riskBadgeBase} ${riskTone}`}>C.R.: {risco}</span>
+    <span className={styles.riskBadgeBase}>
+      <span style={{ color: "#222", fontWeight: 800 }}>C.R.:</span>{" "}
+      <span className={riskTone}>{risco}</span>
+    </span>
   );
 
   const CardInner = (
@@ -86,15 +89,30 @@ export default function ProcedimentoCard({
   );
 
   // Quando houver href, o card inteiro vira <Link/>
+
   if (detalhesHref) {
     return (
       <Link
         href={detalhesHref}
         className={`${styles.article} ${styles.clickable} ${className}`}
         aria-label={titulo}
+        onClick={onDetalhesClick}
       >
         {CardInner}
       </Link>
+    );
+  }
+
+  if (onDetalhesClick) {
+    return (
+      <article
+        className={`${styles.article} ${styles.clickable} ${className}`}
+        aria-label={titulo}
+        onClick={onDetalhesClick}
+        style={{ cursor: "pointer" }}
+      >
+        {CardInner}
+      </article>
     );
   }
 

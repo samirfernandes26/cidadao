@@ -24,7 +24,7 @@ export default function InformacoesBasicas({
         <span className={styles.labeledValue}>{dataAgendamento ?? "—"}</span>
       </Field>
 
-      <Field label="Risco">
+      <Field label="C.R.">
         <Badge variant="risco">{marcacao.classificacao_de_risco}</Badge>
       </Field>
 

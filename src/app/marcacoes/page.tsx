@@ -1,10 +1,28 @@
+"use client";
 // src/app/dashboard/page.tsx
 import ProcedimentoCard from "@/components/ProcedimentoCardCss";
+
 import type { Marcacao } from "@/models/marcacao";
-import marcacoesMock from "./marcacoes.mock";
 
 // seu tipo atual do card
 import type { Procedimento } from "@/models";
+import getMarcacoesService from "@/services/marcacao/marcacao_service";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import styles from "./marcacoes.module.css";
+
+// Função utilitária local para salvar a marcação no sessionStorage
+function salvarMarcacaoSession(marcacao: Marcacao) {
+  if (typeof window === "undefined" || !marcacao?.agendamento_id) return;
+  try {
+    sessionStorage.setItem(
+      `marcacao-${marcacao.agendamento_id}`,
+      JSON.stringify(marcacao)
+    );
+  } catch (e) {
+    // Pode logar erro se quiser
+  }
+}
 
 // helper só para exibir datas bonitinhas
 function formatPtBR(input?: string | null) {
@@ -41,24 +59,67 @@ function toCardData(m: Marcacao): Procedimento {
   };
 }
 
-export default async function Dashboard() {
-  // mock local (sem chamada http)
-  const { data } = marcacoesMock;
+export default function Dashboard() {
+  const [marcacoes, setMarcacoes] = useState<Marcacao[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
-  // mapeia para o formato do card
-  const cards: Procedimento[] = data.map(toCardData);
+  async function handleLogout() {
+    try {
+      await fetch("/api/logout", { method: "POST" });
+      if (typeof window !== "undefined") {
+        sessionStorage.clear();
+      }
+      router.replace("/auth/login");
+    } catch (err) {
+      alert("Erro ao sair. Tente novamente.");
+    }
+  }
+
+  useEffect(() => {
+    let isMounted = true;
+    setLoading(true);
+    getMarcacoesService()
+      .then((result) => {
+        if (isMounted) {
+          setMarcacoes(result);
+          setError(null);
+        }
+      })
+      .catch((err) => {
+        if (isMounted) {
+          setError(err?.message || "Erro ao buscar marcações");
+          setMarcacoes([]);
+        }
+      })
+      .finally(() => {
+        if (isMounted) setLoading(false);
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   return (
     <main className="p-4 sm:p-6">
-      <h1 className="mb-4 text-2xl font-bold">Minhas marcações</h1>
-
+      <div className={styles.header}>
+        <h1 className="mb-4 text-2xl font-bold">Minhas marcações</h1>
+        <button onClick={handleLogout} className={styles.logoutBtn}>
+          Sair
+        </button>
+      </div>
+      {loading && <p>Carregando marcações...</p>}
+      {error && <p style={{ color: "red" }}>{error}</p>}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-1 xl:grid-cols-2">
-        {data.map((m: Marcacao) => (
+        {marcacoes.map((m: Marcacao) => (
           <ProcedimentoCard
             key={m.agendamento_id}
             data={toCardData(m)}
-            // rota de detalhe que fizemos: /marcacoes/[agendamentoId]
-            detalhesHref={`/marcacoes/${m.agendamento_id}`}
+            onDetalhesClick={() => {
+              salvarMarcacaoSession(m);
+              router.push(`/marcacoes/${m.agendamento_id}`);
+            }}
           />
         ))}
       </div>

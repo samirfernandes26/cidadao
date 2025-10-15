@@ -1,19 +1,25 @@
+"use client";
 import MarcacaoDetalhe from "@/components/MarcacaoDetalhe";
-import marcacoesMock from "@/app/marcacoes/marcacoes.mock";
-import { notFound } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter, useParams } from "next/navigation";
 
-export default function Page({
-  params,
-}: {
-  params: { agendamentoId: string };
-}) {
-  const { agendamentoId } = params;
+export default function Page() {
+  const params = useParams();
+  const router = useRouter();
+  const agendamentoId = params?.agendamentoId;
+  const [marcacao, setMarcacao] = useState(null);
 
-  const marcacao = marcacoesMock.data.find(
-    (m) => String(m.agendamento_id) === String(agendamentoId)
-  );
+  useEffect(() => {
+    if (!agendamentoId) return;
+    const data = sessionStorage.getItem(`marcacao-${agendamentoId}`);
+    if (data) {
+      setMarcacao(JSON.parse(data));
+    } else {
+      router.replace("/marcacoes");
+    }
+  }, [agendamentoId, router]);
 
-  if (!marcacao) return notFound();
+  if (!marcacao) return <div>Carregando...</div>;
 
   return (
     <div className="min-h-[60vh] bg-slate-50">

@@ -8,10 +8,10 @@ export default function Address({ endereco }: { endereco: Endereco | null }) {
     endereco;
   const parts = [
     [logradouro].filter(Boolean).join(" "),
-    numero,
+    numero && `Nº: ${numero}`,
     complemento,
-    bairro,
-    cidade && estado ? `${cidade} - ${estado}` : cidade || estado,
+    bairro && `BAIRRO: ${bairro}`,
+    cidade && estado ? `CIDADE: ${cidade} - ${estado}` : cidade || estado,
     cep,
   ].filter(Boolean);
   return <div className={styles.address}>{parts.join("\n")}</div>;

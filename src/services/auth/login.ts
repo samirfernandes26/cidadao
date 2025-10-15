@@ -24,9 +24,6 @@ async function login(login: string, password: string): Promise<IResponse> {
   const base = "https://teste1.versasaude.com.br/api";
 
   try {
-    debugger;
-    await axios.get(`${base}/sanctum/csrf-cookie`);
-
     const { data, headers } = await axios.post<LoginResponse>(
       `${base}/cidadao/login`,
       {

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import requiresPasswordChangeService from "@/services/auth/requires_password_change_service";
+import { useRouter } from "next/navigation";
 
 import styles from "./atualizar_senha.module.css";
 import { useAuth } from "@/hooks/auth";
@@ -46,10 +47,11 @@ export default function AtualizarSenhaPage() {
   const [confirmaSenha, setConfirmaSenha] = useState("");
 
   const { requiresPasswordChange } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
-    if (!requiresPasswordChange) {
-      // redireciona para a home se não precisar mudar a senha
+    if (requiresPasswordChange === false) {
+      router.push("/marcacoes");
     }
   }, [requiresPasswordChange]);
 
@@ -113,7 +115,17 @@ export default function AtualizarSenhaPage() {
 
     setLoading(true);
     try {
-      await requiresPasswordChangeService(new_password, confirm_password);
+      const result = await requiresPasswordChangeService(
+        new_password,
+        confirm_password
+      );
+      if (result === true) {
+        if (typeof window !== "undefined") {
+          sessionStorage.setItem("requires_password_change", "false");
+        }
+        router.push("/marcacoes");
+        return;
+      }
       setOkMsg("Senha atualizada com sucesso!");
       (e.target as HTMLFormElement).reset();
     } catch (error: any) {
