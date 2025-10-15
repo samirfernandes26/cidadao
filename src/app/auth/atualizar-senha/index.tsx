@@ -53,7 +53,7 @@ export default function AtualizarSenhaPage() {
     if (requiresPasswordChange === false) {
       router.push("/marcacoes");
     }
-  }, [requiresPasswordChange]);
+  }, [requiresPasswordChange, router]);
 
   // Requisitos de senha
   const requisitos = [

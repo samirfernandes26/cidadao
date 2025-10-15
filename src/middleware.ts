@@ -6,7 +6,7 @@ import { withValidCookie } from "@/middlewares/cookie_valid";
 const middlewares = [withAuth];
 
 export function middleware(request: NextRequest) {
-  let response = NextResponse.next(); // Resposta inicial
+  const response = NextResponse.next(); // Resposta inicial
 
   for (const mw of middlewares) {
     const result = mw(request); // Supondo que seus middlewares retornam NextResponse

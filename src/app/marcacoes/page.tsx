@@ -10,6 +10,7 @@ import getMarcacoesService from "@/services/marcacao/marcacao_service";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import styles from "./marcacoes.module.css";
+import { logoutService } from "@/services/auth/logout_service";
 
 // Função utilitária local para salvar a marcação no sessionStorage
 function salvarMarcacaoSession(marcacao: Marcacao) {
@@ -67,11 +68,15 @@ export default function Dashboard() {
 
   async function handleLogout() {
     try {
-      await fetch("/api/logout", { method: "POST" });
+      const response = await logoutService();
       if (typeof window !== "undefined") {
         sessionStorage.clear();
       }
-      router.replace("/auth/login");
+      if (response) {
+        router.replace("/auth/login");
+      } else {
+        alert("Erro ao sair. Tente novamente.");
+      }
     } catch (err) {
       alert("Erro ao sair. Tente novamente.");
     }

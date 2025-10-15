@@ -35,25 +35,6 @@ export default function LoginIndex() {
 
     try {
       const response = await login(usuario, senha);
-
-      // const res = await fetch("/api/login", {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify({ usuario, senha }),
-      // });
-      // if (res.ok) {
-      //   // espera que a rota /api/login retorne { ok: true, user: { ... } }
-      //   const body = (await res.json()) as { ok: true; user: VersaUser };
-      //   // login(body.user); // ⬅️ guarda no sessionStorage e atualiza contexto
-      // const next = params.get("next") || "/listaMarcacoes";
-      // router.push(next);
-      // return;
-      // }
-      // setErr(
-      //   res.status === 401
-      //     ? "Credenciais inválidas. Tente novamente."
-      //     : "Ocorreu um erro. Por favor, tente novamente mais tarde."
-      // );
     } catch {
       setErr("Ocorreu um erro. Por favor, tente novamente mais tarde.");
     } finally {
