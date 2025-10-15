@@ -21,7 +21,6 @@ type AuthContextType = {
   requiresPasswordChange?: boolean;
   login: (login: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
-  refresh: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
@@ -33,25 +32,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [requiresPasswordChange, setRequiresPasswordChange] =
     useState<boolean>(false);
 
-  const refresh = async () => {
-    // try {
-    //   const res = await fetch("/api/auth/session", { cache: "no-store" });
-    //   if (res.ok) {
-    //     setStatus("authenticated");
-    //   } else {
-    //     setStatus("unauthenticated");
-    //     setUser(null);
-    //     clearUserFromSession();
-    //   }
-    // } catch {
-    //   setStatus("unauthenticated");
-    //   setUser(null);
-    //   clearUserFromSession();
-    // }
-  };
-
   async function login(login: string, password: string) {
-    const { type, message, user, requiresPasswordChange } = await doLogin(
+    const { type, user, requiresPasswordChange } = await doLogin(
       login,
       password
     );
@@ -70,14 +52,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const logout = async () => {
-    // await fetch("/api/logout", { method: "POST" });
-    // clearUserFromSession();
-    // setUser(null);
-    // setStatus("unauthenticated");
+    // TODO: chamar serviço de logout
   };
 
   const value = useMemo(
-    () => ({ status, user, login, logout, refresh, requiresPasswordChange }),
+    () => ({ status, user, login, logout, requiresPasswordChange }),
     [status, user, requiresPasswordChange]
   );
 

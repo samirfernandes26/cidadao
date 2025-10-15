@@ -1,5 +1,5 @@
+import { IError } from "@/models";
 import { NextResponse } from "next/server";
-// import { versaLoginTyped } from "@/services/auth/login";
 
 export async function POST(req: Request) {
   try {
@@ -9,9 +9,10 @@ export async function POST(req: Request) {
     }
 
     // return res;
-  } catch (err: any) {
-    const status = err?.status === 401 ? 401 : 500;
-    const error = status === 401 ? "INVALID_CREDENTIALS" : "SERVER_ERROR";
-    return NextResponse.json({ error }, { status });
+  } catch (error: unknown) {
+    const status = (error as IError)?.status === 401 ? 401 : 500;
+    const errorMessage =
+      status === 401 ? "INVALID_CREDENTIALS" : "SERVER_ERROR";
+    return NextResponse.json({ error: errorMessage }, { status });
   }
 }

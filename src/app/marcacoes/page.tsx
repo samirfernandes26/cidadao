@@ -4,7 +4,6 @@ import ProcedimentoCard from "@/components/ProcedimentoCardCss";
 
 import type { Marcacao } from "@/models/marcacao";
 
-// seu tipo atual do card
 import type { Procedimento } from "@/models";
 import getMarcacoesService from "@/services/marcacao/marcacao_service";
 import { useRouter } from "next/navigation";
@@ -12,7 +11,6 @@ import { useEffect, useState } from "react";
 import styles from "./marcacoes.module.css";
 import { logoutService } from "@/services/auth/logout_service";
 
-// Função utilitária local para salvar a marcação no sessionStorage
 function salvarMarcacaoSession(marcacao: Marcacao) {
   if (typeof window === "undefined" || !marcacao?.agendamento_id) return;
   try {
@@ -20,8 +18,8 @@ function salvarMarcacaoSession(marcacao: Marcacao) {
       `marcacao-${marcacao.agendamento_id}`,
       JSON.stringify(marcacao)
     );
-  } catch (e) {
-    // Pode logar erro se quiser
+  } catch (error: unknown) {
+    console.error("Erro ao salvar marcação no sessionStorage:", error);
   }
 }
 
@@ -77,8 +75,8 @@ export default function Dashboard() {
       } else {
         alert("Erro ao sair. Tente novamente.");
       }
-    } catch (err) {
-      alert("Erro ao sair. Tente novamente.");
+    } catch (error: unknown) {
+      alert("Erro ao sair. Tente novamente. " + (error as Error)?.message);
     }
   }
 

@@ -128,9 +128,10 @@ export default function AtualizarSenhaPage() {
       }
       setOkMsg("Senha atualizada com sucesso!");
       (e.target as HTMLFormElement).reset();
-    } catch (error: any) {
+    } catch (error: unknown) {
       setErrMsg(
-        error?.message || "Não foi possível atualizar a senha. Tente novamente."
+        (error as Error)?.message ||
+          "Não foi possível atualizar a senha. Tente novamente."
       );
     } finally {
       setLoading(false);

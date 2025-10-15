@@ -28,10 +28,12 @@ export default async function getMarcacoesService(): Promise<Marcacao[]> {
     }
 
     return response.data.data as Marcacao[];
-  } catch (error: any) {
-    console.error("Erro em getMarcacoesService:", error, error?.response?.data);
-    throw new Error(
-      error?.response?.data?.message || "Falha ao obter marcações"
+  } catch (error: unknown) {
+    console.error(
+      "Erro em getMarcacoesService:",
+      error,
+      (error as Error).message
     );
+    throw new Error((error as Error).message || "Falha ao obter marcações");
   }
 }

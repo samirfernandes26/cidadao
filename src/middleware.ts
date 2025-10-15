@@ -1,7 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 import { withAuth } from "@/middlewares/auth";
-import { withValidCookie } from "@/middlewares/cookie_valid";
 
 const middlewares = [withAuth];
 

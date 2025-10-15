@@ -40,15 +40,13 @@ async function requiresPasswordChangeService(
           (response.data?.message || response.statusText)
       );
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error(
       "Erro em requiresPasswordChangeService:",
       error,
-      error?.response?.data
+      (error as Error).message || "Falha ao alterar a senha"
     );
-    throw new Error(
-      error?.response?.data?.message || "Falha ao alterar a senha"
-    );
+    throw new Error((error as Error).message || "Falha ao alterar a senha");
   }
 }
 

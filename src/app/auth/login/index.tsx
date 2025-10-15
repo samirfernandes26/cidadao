@@ -22,7 +22,7 @@ export default function LoginIndex() {
       const next = params.get("next") || "/marcacoes";
       router.push(next);
     }
-  }, [user]);
+  }, [user, router, params]);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -34,7 +34,7 @@ export default function LoginIndex() {
     const senha = String(form.get("senha") || "");
 
     try {
-      const response = await login(usuario, senha);
+      await login(usuario, senha);
     } catch {
       setErr("Ocorreu um erro. Por favor, tente novamente mais tarde.");
     } finally {

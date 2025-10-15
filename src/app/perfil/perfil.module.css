@@ -1,0 +1,159 @@
+:root {
+  --bg: #f7f7fa;
+  --white: #fff;
+  --text: #111827;
+  --muted: #6b7280;
+
+  --border: #e5e7eb;
+
+  --primary: #0070f3;
+  --primary-700: #0059c1;
+}
+
+/* ===== Página ocupa toda a tela, sem “card” ===== */
+.pageFull {
+  min-height: 100dvh;
+  background: var(--bg);
+  display: block;
+}
+
+/* Container fluido de ponta a ponta, com padding responsivo
+   e largura máxima maior p/ monitores */
+.container {
+  width: 100%;
+  max-width: min(1400px, 96vw);
+  margin: 0 auto;
+  padding: clamp(16px, 2vw, 40px);
+}
+
+/* ===== Títulos ===== */
+.title {
+  margin: 0 0 18px;
+  font-weight: 700;
+  color: var(--text);
+  font-size: clamp(1.4rem, 2.2vw, 2rem);
+}
+
+/* ===== Form / Layout Responsivo =====
+   Cada seção vira uma coluna quando houver espaço; ocupa 1fr */
+.form {
+  display: grid;
+  gap: clamp(14px, 1.6vw, 24px);
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(clamp(340px, 40vw, 560px), 1fr)
+  );
+  align-items: start;
+}
+
+/* Cada seção é um painel esticado, cobrindo a largura disponível */
+.section {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: clamp(14px, 1.2vw, 20px);
+  background: var(--white);
+}
+
+.sectionTitle {
+  margin: 0 0 12px;
+  color: var(--text);
+  font-weight: 600;
+  font-size: clamp(1rem, 1.6vw, 1.125rem);
+}
+
+/* Campos do perfil: sempre 1 col (Nome e E-mail empilhados) */
+.fieldGrid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 1fr;
+}
+
+/* Campos de senha: pilha vertical */
+.fieldStack {
+  display: grid;
+  gap: 12px;
+}
+
+/* ===== Campos ===== */
+.label {
+  display: grid;
+  gap: 6px;
+}
+
+.labelText {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.label_2 {
+  display: grid;
+  gap: 0.25rem;
+  position: relative;
+}
+
+.input {
+  width: 100%;
+  appearance: none;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--white);
+  padding: clamp(10px, 1.1vw, 14px) clamp(12px, 1.2vw, 16px);
+  font-size: clamp(1rem, 0.8vw + 0.6rem, 1.125rem);
+  color: var(--text);
+  outline: none;
+  transition:
+    box-shadow 0.15s ease,
+    border-color 0.15s ease;
+}
+.input:focus {
+  border-color: #bfdbfe;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.35);
+}
+
+/* Campo somente leitura “cheio” (Nome) */
+.staticField {
+  background: #f5f5f5;
+  border-radius: 10px;
+  padding: clamp(10px, 1.1vw, 14px) clamp(12px, 1.2vw, 16px);
+  font-size: clamp(1rem, 0.8vw + 0.6rem, 1.125rem);
+  color: #222;
+  font-weight: 400;
+  border: 1px solid #e0e0e0;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+}
+
+/* ===== Ações (botão fixo no rodapé, centralizado) ===== */
+.actions {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: transparent;
+  padding: 1rem 0;
+  display: flex;
+  justify-content: center;
+  z-index: 10;
+}
+
+.primaryBtn {
+  background: var(--primary);
+  color: #fff;
+  border: 0;
+  border-radius: 12px;
+  padding: clamp(12px, 1.2vw, 16px) clamp(18px, 2.2vw, 24px);
+  font-weight: 600;
+  cursor: pointer;
+  width: clamp(280px, 60vw, 1000px); /* cresce com a tela até 1000px */
+  transition:
+    background 0.15s ease,
+    transform 0.04s ease;
+  box-shadow: 0 2px 8px #0070f322;
+}
+.primaryBtn:hover {
+  background: var(--primary-700);
+}
+.primaryBtn:active {
+  transform: translateY(1px);
+}
