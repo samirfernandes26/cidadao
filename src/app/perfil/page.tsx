@@ -2,12 +2,42 @@
 
 import { useState } from "react";
 import styles from "./perfil.module.css";
+import updatePerfilService from "@/services/perfil/update_perfil_service";
+import { useForm, FieldValues } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { updatePerfilValidators } from "@/validators/update_perfil_validators";
+
+import { InputControl } from "@/components/Form/inputControl/index";
+
+type PerfilForm = {
+  email: string;
+  senhaAtual: string;
+  novaSenha: string;
+  confirmarSenha: string;
+};
 
 export default function PerfilPage() {
-  const [showNew, setShowNew] = useState(false);
-  const [showConf, setShowConf] = useState(false);
+  // Apenas para feedback visual de senha
   const [novaSenha, setNovaSenha] = useState("");
   const [confirmaSenha, setConfirmaSenha] = useState("");
+  const [errMsg, setErrMsg] = useState<string | null>(null);
+  const [okMsg, setOkMsg] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<PerfilForm>({
+    resolver: yupResolver(updatePerfilValidators),
+    reValidateMode: "onChange",
+    defaultValues: {
+      email: "usuario@email.com",
+      senhaAtual: "",
+      novaSenha: "",
+      confirmarSenha: "",
+    },
+  });
 
   // Requisitos de senha
   const requisitos = [
@@ -44,12 +74,30 @@ export default function PerfilPage() {
     },
   ];
 
+  async function onSubmit(data: any) {
+    setErrMsg(null);
+    setOkMsg(null);
+    setLoading(true);
+    try {
+      await updatePerfilService(data);
+      setOkMsg("Dados atualizados com sucesso!");
+    } catch (error: any) {
+      setErrMsg(error?.message || "Erro ao atualizar dados. Tente novamente.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <main className={styles.pageFull}>
       <div className={styles.container}>
         <h1 className={styles.title}>Meu Perfil</h1>
 
-        <form className={styles.form} noValidate>
+        <form
+          className={styles.form}
+          noValidate
+          onSubmit={handleSubmit(onSubmit)}
+        >
           <section className={`${styles.section} ${styles.sectionProfile}`}>
             <h2 className={styles.sectionTitle}>Dados do Perfil</h2>
 
@@ -63,13 +111,16 @@ export default function PerfilPage() {
 
               <label className={styles.label}>
                 <span className={styles.labelText}>E-mail</span>
-                <input
+                <InputControl<PerfilForm>
+                  control={control}
+                  name="email"
                   type="email"
-                  name="novoEmail"
-                  defaultValue="usuario@email.com"
-                  required
                   className={styles.input}
+                  required
                 />
+                {errors.email && (
+                  <span className={styles.error}>{errors.email.message}</span>
+                )}
               </label>
             </div>
           </section>
@@ -78,33 +129,38 @@ export default function PerfilPage() {
             <h2 className={styles.sectionTitle}>Senha Atual</h2>
 
             <label className={styles.label}>
-              <span className={styles.labelText}>Confirmar nova senha</span>
-              <input
-                name="current_password"
-                type={showConf ? "text" : "password"}
+              <span className={styles.labelText}>Senha atual</span>
+              <InputControl<PerfilForm>
+                control={control}
+                name="senhaAtual"
+                type="password"
                 className={styles.input}
                 placeholder="senha atual"
                 autoComplete="current-password"
                 minLength={8}
                 required
-                // value={}
-                // onChange={(e) => {}}
               />
+              {errors.senhaAtual && (
+                <span className={styles.error}>
+                  {errors.senhaAtual.message}
+                </span>
+              )}
             </label>
 
             <label className={styles.label}>
               <span className={styles.labelText}>Nova senha</span>
-              <input
-                name="new_password"
-                type={showNew ? "text" : "password"}
+              <InputControl<PerfilForm>
+                control={control}
+                name="novaSenha"
+                type="password"
                 className={styles.input}
                 placeholder="Mínimo de 8 caracteres"
                 autoComplete="new-password"
                 minLength={8}
-                required
-                value={novaSenha}
-                onChange={(e) => setNovaSenha(e.target.value)}
               />
+              {errors.novaSenha && (
+                <span className={styles.error}>{errors.novaSenha.message}</span>
+              )}
             </label>
 
             <ul className={styles.hints} style={{ marginBottom: 8 }}>
@@ -134,25 +190,47 @@ export default function PerfilPage() {
 
             <label className={styles.label}>
               <span className={styles.labelText}>Confirmar nova senha</span>
-              <input
-                name="confirm_password"
-                type={showConf ? "text" : "password"}
+              <InputControl<PerfilForm>
+                control={control}
+                name="confirmarSenha"
+                type="password"
                 className={styles.input}
                 placeholder="Repita a nova senha"
                 autoComplete="new-password"
                 minLength={8}
-                required
-                value={confirmaSenha}
-                onChange={(e) => {
-                  setConfirmaSenha(e.target.value);
-                }}
               />
+              {errors.confirmarSenha && (
+                <span className={styles.error}>
+                  {errors.confirmarSenha.message}
+                </span>
+              )}
             </label>
           </section>
 
           <div className={styles.actions}>
-            <button type="submit" className={styles.primaryBtn}>
-              Atualizar Dados
+            {errMsg && (
+              <p className={styles.error} aria-live="assertive">
+                {errMsg}
+              </p>
+            )}
+            {okMsg && (
+              <p className={styles.success} aria-live="polite">
+                {okMsg}
+              </p>
+            )}
+            <button
+              type="button"
+              className={styles.primaryBtn}
+              onClick={() => window.history.back()}
+            >
+              Voltar
+            </button>
+            <button
+              type="submit"
+              className={styles.primaryBtn}
+              disabled={loading}
+            >
+              {loading ? "Salvando..." : "Atualizar Dados"}
             </button>
           </div>
         </form>

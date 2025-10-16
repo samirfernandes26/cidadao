@@ -1,4 +1,4 @@
-import { IError } from "@/models";
+import { IError } from "@/models/IError";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {

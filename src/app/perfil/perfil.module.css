@@ -143,6 +143,7 @@
   border: 0;
   border-radius: 12px;
   padding: clamp(12px, 1.2vw, 16px) clamp(18px, 2.2vw, 24px);
+  margin-inline: 1.5%;
   font-weight: 600;
   cursor: pointer;
   width: clamp(280px, 60vw, 1000px); /* cresce com a tela até 1000px */
