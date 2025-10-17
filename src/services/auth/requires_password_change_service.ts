@@ -24,7 +24,6 @@ async function requiresPasswordChangeService(
       {
         headers: {
           "X-Requested-With": "XMLHttpRequest",
-          Authorization: `Bearer ${token.value}`,
           Accept: "application/json",
           "Content-Type": "application/json",
         },

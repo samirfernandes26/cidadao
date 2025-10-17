@@ -54,7 +54,8 @@ export default function PerfilPage() {
     },
   ];
 
-  async function onSubmit(data: any) {
+  async function onSubmit(event: React.FormEvent) {
+    event.preventDefault();
     setLoading(true);
     setErrorSenhaAtual("");
     setErrorNovaSenha("");
@@ -92,23 +93,23 @@ export default function PerfilPage() {
 
         if (
           (!!confirmarSenha && !novaSenha) ||
-          (confirmarSenha! && !!novaSenha)
+          (!confirmarSenha && !!novaSenha)
         ) {
           setErrorNovaSenha(
             "Nova senha é obrigatória se confirmar senha for preenchida."
           );
-          return;
         }
 
-        await updatePerfilService({
+        const result = await updatePerfilService({
           senhaAtual,
           novaSenha,
           confirmarSenha,
           email,
         });
+
+        console.log("Resultado da atualização do perfil:", result);
       }
 
-      // Função de validação de senha
       function validateNovaSenha(
         novaSenha: string,
         confirmaSenha: string

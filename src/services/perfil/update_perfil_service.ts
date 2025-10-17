@@ -10,11 +10,10 @@ interface UpdatePerfilParams {
   email?: string;
 }
 
-export default async function updatePerfilService(data: UpdatePerfilParams) {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("auth_token");
-
-  if (!token) throw new Error("Você não está autenticado");
+export default async function updatePerfilService(
+  data: UpdatePerfilParams
+): Promise<boolean | null> {
+  // if (!token) throw new Error("Você não está autenticado");
 
   try {
     const base = "https://teste1.versasaude.com.br/api";
@@ -22,31 +21,31 @@ export default async function updatePerfilService(data: UpdatePerfilParams) {
     const response = await axios.post(
       `${base}/cidadao/atualizar-perfil`,
       {
-        nova_senha: data.novaSenha,
-        confirmar_senha: data.confirmarSenha,
         senha_atual: data.senhaAtual,
-        "e-mail": data.email,
+        nova_senha: data.novaSenha,
+        email: data.email,
+        confirmar_senha: data.confirmarSenha,
       },
       {
         headers: {
-          "X-Requested-With": "XMLHttpRequest",
-          Authorization: `Bearer ${token.value}`,
           Accept: "application/json",
           "Content-Type": "application/json",
         },
-        withCredentials: true,
+        withCredentials: false,
       }
     );
 
     if (!response.data || !Array.isArray(response.data.data)) {
-      return [];
+      return false;
     }
+    return true;
   } catch (error: unknown) {
     console.error(
-      "Erro em getMarcacoesService:",
+      "Erro em updatePerfilService:",
       error,
       (error as Error).message
     );
-    throw new Error((error as Error).message || "Falha ao obter marcações");
+
+    throw new Error((error as Error).message || "Falha ao atualizar perfil");
   }
 }
