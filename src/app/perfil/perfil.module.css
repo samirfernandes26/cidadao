@@ -77,6 +77,7 @@
 /* ===== Campos ===== */
 .label {
   display: grid;
+  margin-top: 1rem;
   gap: 6px;
 }
 
@@ -89,6 +90,12 @@
   display: grid;
   gap: 0.25rem;
   position: relative;
+}
+
+.labelError {
+  display: grid;
+  gap: 3px;
+  color: red;
 }
 
 .input {
@@ -157,4 +164,11 @@
 }
 .primaryBtn:active {
   transform: translateY(1px);
+}
+
+.hints {
+  margin-top: 0.5rem;
+  padding-left: 0.25rem;
+  color: var(--gray-600);
+  font-size: 0.875rem;
 }

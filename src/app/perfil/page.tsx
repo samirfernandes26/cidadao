@@ -3,41 +3,21 @@
 import { useState } from "react";
 import styles from "./perfil.module.css";
 import updatePerfilService from "@/services/perfil/update_perfil_service";
-import { useForm, FieldValues } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { updatePerfilValidators } from "@/validators/update_perfil_validators";
-
-import { InputControl } from "@/components/Form/inputControl/index";
-
-type PerfilForm = {
-  email: string;
-  senhaAtual: string;
-  novaSenha: string;
-  confirmarSenha: string;
-};
 
 export default function PerfilPage() {
   // Apenas para feedback visual de senha
   const [novaSenha, setNovaSenha] = useState("");
-  const [confirmaSenha, setConfirmaSenha] = useState("");
-  const [errMsg, setErrMsg] = useState<string | null>(null);
-  const [okMsg, setOkMsg] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [senhaFocus, setsenhaFocus] = useState(false);
+  const [confirmarSenha, setConfirmarSenha] = useState("");
+  const [email, setEmail] = useState("");
+  const [senhaAtual, setSenhaAtual] = useState("");
 
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<PerfilForm>({
-    resolver: yupResolver(updatePerfilValidators),
-    reValidateMode: "onChange",
-    defaultValues: {
-      email: "usuario@email.com",
-      senhaAtual: "",
-      novaSenha: "",
-      confirmarSenha: "",
-    },
-  });
+  const [ErrorEmail, setErrorEmail] = useState("");
+  const [ErrorSenhaAtual, setErrorSenhaAtual] = useState("");
+  const [ErrorNovaSenha, setErrorNovaSenha] = useState("");
+  const [ErrorConfirmaSenha, setErrorConfirmaSenha] = useState("");
+
+  const [loading, setLoading] = useState(false);
 
   // Requisitos de senha
   const requisitos = [
@@ -70,19 +50,89 @@ export default function PerfilPage() {
     })),
     {
       label: "Senhas conferem",
-      ok: novaSenha.length > 0 && novaSenha === confirmaSenha,
+      ok: novaSenha.length > 0 && novaSenha === confirmarSenha,
     },
   ];
 
   async function onSubmit(data: any) {
-    setErrMsg(null);
-    setOkMsg(null);
     setLoading(true);
+    setErrorSenhaAtual("");
+    setErrorNovaSenha("");
+    setErrorConfirmaSenha("");
+    setErrorEmail("");
+
     try {
-      await updatePerfilService(data);
-      setOkMsg("Dados atualizados com sucesso!");
+      if (!senhaAtual) {
+        setErrorSenhaAtual("A senha atual é obrigatória.");
+      } else {
+        if (!!email) {
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (!emailRegex.test(email)) {
+            setErrorEmail("E-mail inválido.");
+          }
+        }
+
+        if (!!novaSenha && !confirmarSenha) {
+          setConfirmarSenha("A confirmação de senha é obrigatória.");
+        }
+
+        if (!!confirmarSenha && !novaSenha) {
+          setErrorNovaSenha("A nova senha é obrigatória.");
+        }
+
+        if (
+          !validateNovaSenha(novaSenha, confirmarSenha) &&
+          !!novaSenha &&
+          !!confirmarSenha
+        ) {
+          setErrorNovaSenha(
+            "A atualização de senha não cumpre todos os requisitos necessários."
+          );
+        }
+
+        if (
+          (!!confirmarSenha && !novaSenha) ||
+          (confirmarSenha! && !!novaSenha)
+        ) {
+          setErrorNovaSenha(
+            "Nova senha é obrigatória se confirmar senha for preenchida."
+          );
+          return;
+        }
+
+        await updatePerfilService({
+          senhaAtual,
+          novaSenha,
+          confirmarSenha,
+          email,
+        });
+      }
+
+      // Função de validação de senha
+      function validateNovaSenha(
+        novaSenha: string,
+        confirmaSenha: string
+      ): boolean {
+        if (!novaSenha) return true;
+        if (
+          novaSenha.length < 8 ||
+          !/[^A-Za-z0-9]/.test(novaSenha) ||
+          !/[0-9]/.test(novaSenha) ||
+          !/[A-Z]/.test(novaSenha) ||
+          !/[a-z]/.test(novaSenha) ||
+          !confirmaSenha ||
+          novaSenha !== confirmaSenha
+        ) {
+          return false;
+        }
+        return true;
+      }
+
+      debugger;
     } catch (error: any) {
-      setErrMsg(error?.message || "Erro ao atualizar dados. Tente novamente.");
+      console.log(
+        error?.message || "Erro ao atualizar dados. Tente novamente."
+      );
     } finally {
       setLoading(false);
     }
@@ -93,11 +143,7 @@ export default function PerfilPage() {
       <div className={styles.container}>
         <h1 className={styles.title}>Meu Perfil</h1>
 
-        <form
-          className={styles.form}
-          noValidate
-          onSubmit={handleSubmit(onSubmit)}
-        >
+        <form className={styles.form} noValidate onSubmit={onSubmit}>
           <section className={`${styles.section} ${styles.sectionProfile}`}>
             <h2 className={styles.sectionTitle}>Dados do Perfil</h2>
 
@@ -111,15 +157,17 @@ export default function PerfilPage() {
 
               <label className={styles.label}>
                 <span className={styles.labelText}>E-mail</span>
-                <InputControl<PerfilForm>
-                  control={control}
+                <input
                   name="email"
                   type="email"
                   className={styles.input}
-                  required
+                  required={false}
+                  placeholder="Informe aqui seu e-mail"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
-                {errors.email && (
-                  <span className={styles.error}>{errors.email.message}</span>
+                {!!ErrorEmail && (
+                  <span className={styles.labelError}>{ErrorEmail}</span>
                 )}
               </label>
             </div>
@@ -130,94 +178,91 @@ export default function PerfilPage() {
 
             <label className={styles.label}>
               <span className={styles.labelText}>Senha atual</span>
-              <InputControl<PerfilForm>
-                control={control}
+              <input
                 name="senhaAtual"
                 type="password"
                 className={styles.input}
                 placeholder="senha atual"
                 autoComplete="current-password"
                 minLength={8}
-                required
+                required={true}
+                value={senhaAtual}
+                onChange={(e) => setSenhaAtual(e.target.value)}
               />
-              {errors.senhaAtual && (
-                <span className={styles.error}>
-                  {errors.senhaAtual.message}
-                </span>
+              {!!ErrorSenhaAtual && (
+                <span className={styles.labelError}>{ErrorSenhaAtual}</span>
               )}
             </label>
 
             <label className={styles.label}>
               <span className={styles.labelText}>Nova senha</span>
-              <InputControl<PerfilForm>
-                control={control}
+              <input
                 name="novaSenha"
                 type="password"
                 className={styles.input}
                 placeholder="Mínimo de 8 caracteres"
                 autoComplete="new-password"
                 minLength={8}
+                value={novaSenha}
+                onChange={(e) => setNovaSenha(e.target.value)}
+                required={!!confirmarSenha}
+                onFocus={() => setsenhaFocus(true)}
+                onBlur={() => setsenhaFocus(false)}
               />
-              {errors.novaSenha && (
-                <span className={styles.error}>{errors.novaSenha.message}</span>
+              {!!ErrorNovaSenha && (
+                <span className={styles.labelError}>{ErrorNovaSenha}</span>
               )}
             </label>
 
-            <ul className={styles.hints} style={{ marginBottom: 8 }}>
-              {requisitosVisuais.map((req, idx) => (
-                <li
-                  key={idx}
-                  style={{ display: "flex", alignItems: "center", gap: 6 }}
-                >
-                  <span
-                    style={{
-                      display: "inline-block",
-                      width: 12,
-                      height: 12,
-                      borderRadius: "50%",
-                      background: req.ok ? "#2ecc40" : "#ff4136",
-                      border: "1px solid #ccc",
-                      marginRight: 6,
-                    }}
-                    aria-label={
-                      req.ok ? "Requisito atendido" : "Requisito não atendido"
-                    }
-                  />
-                  {req.label}
-                </li>
-              ))}
-            </ul>
+            {(novaSenha.length > 0 || senhaFocus) && (
+              <ul className={styles.hints} style={{ marginBottom: 8 }}>
+                {requisitosVisuais.map((req, idx) => (
+                  <li
+                    key={idx}
+                    style={{ display: "flex", alignItems: "center", gap: 6 }}
+                  >
+                    <span
+                      style={{
+                        display: "inline-block",
+                        width: 12,
+                        height: 12,
+                        borderRadius: "50%",
+                        background: req.ok ? "#2ecc40" : "#ff4136",
+                        border: "1px solid #ccc",
+                        marginRight: 6,
+                      }}
+                      aria-label={
+                        req.ok ? "Requisito atendido" : "Requisito não atendido"
+                      }
+                    />
+                    {req.label}
+                  </li>
+                ))}
+              </ul>
+            )}
 
             <label className={styles.label}>
               <span className={styles.labelText}>Confirmar nova senha</span>
-              <InputControl<PerfilForm>
-                control={control}
+              <input
                 name="confirmarSenha"
                 type="password"
                 className={styles.input}
                 placeholder="Repita a nova senha"
                 autoComplete="new-password"
                 minLength={8}
+                value={confirmarSenha}
+                onChange={(e) => setConfirmarSenha(e.target.value)}
+                required={!!novaSenha}
+                onFocus={() => setsenhaFocus(true)}
+                onBlur={() => setsenhaFocus(false)}
               />
-              {errors.confirmarSenha && (
-                <span className={styles.error}>
-                  {errors.confirmarSenha.message}
-                </span>
+              {!!ErrorConfirmaSenha && (
+                <span className={styles.labelError}>{ErrorConfirmaSenha}</span>
               )}
             </label>
           </section>
 
           <div className={styles.actions}>
-            {errMsg && (
-              <p className={styles.error} aria-live="assertive">
-                {errMsg}
-              </p>
-            )}
-            {okMsg && (
-              <p className={styles.success} aria-live="polite">
-                {okMsg}
-              </p>
-            )}
             <button
               type="button"
               className={styles.primaryBtn}
