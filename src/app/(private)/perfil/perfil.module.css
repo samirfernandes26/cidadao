@@ -1,0 +1,41 @@
+:root {
+  --bg: #f7f7fa;
+  --white: #fff;
+  --text: #111827;
+  --muted: #6b7280;
+
+  --border: #e5e7eb;
+
+  --primary: #0070f3;
+  --primary-700: #0059c1;
+}
+
+.pageFull {
+  min-height: 100dvh;
+  background: var(--bg);
+  display: block;
+}
+
+.container {
+  width: 100%;
+  max-width: min(1400px, 96vw);
+  margin: 0 auto;
+  padding: clamp(16px, 2vw, 40px);
+}
+
+.title {
+  margin: 0 0 18px;
+  font-weight: 700;
+  color: var(--text);
+  font-size: clamp(1.4rem, 2.2vw, 2rem);
+}
+
+.form {
+  display: grid;
+  gap: clamp(14px, 1.6vw, 24px);
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(clamp(340px, 40vw, 560px), 1fr)
+  );
+  align-items: start;
+}

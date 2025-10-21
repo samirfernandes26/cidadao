@@ -1,0 +1,13 @@
+.section {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: clamp(14px, 1.2vw, 20px);
+  background: #fff;
+}
+
+.sectionTitle {
+  margin: 0 0 12px;
+  color: #111827;
+  font-weight: 600;
+  font-size: clamp(1rem, 1.6vw, 1.125rem);
+}

@@ -1,0 +1,33 @@
+.actions {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: transparent;
+  padding: 1rem 0;
+  display: flex;
+  justify-content: center;
+  z-index: 10;
+}
+
+.primaryBtn {
+  background: #0070f3;
+  color: #fff;
+  border: 0;
+  border-radius: 12px;
+  padding: clamp(12px, 1.2vw, 16px) clamp(18px, 2.2vw, 24px);
+  margin-inline: 1.5%;
+  font-weight: 600;
+  cursor: pointer;
+  width: clamp(280px, 60vw, 1000px); /* cresce com a tela até 1000px */
+  transition:
+    background 0.15s ease,
+    transform 0.04s ease;
+  box-shadow: 0 2px 8px #0070f322;
+}
+.primaryBtn:hover {
+  background: #0059c1;
+}
+.primaryBtn:active {
+  transform: translateY(1px);
+}
