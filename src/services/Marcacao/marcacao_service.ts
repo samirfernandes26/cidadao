@@ -2,7 +2,7 @@
 
 import { cookies } from "next/headers";
 import axios from "axios";
-import { Marcacao } from "@/models/marcacao";
+import { Marcacao } from "@/interfaces/marcacao";
 
 export default async function getMarcacoesService(): Promise<Marcacao[]> {
   const cookieStore = await cookies();

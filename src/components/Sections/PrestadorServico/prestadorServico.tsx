@@ -1,9 +1,9 @@
 import React from "react";
-import type { Instituicao } from "@/models/marcacao";
+import type { Instituicao } from "@/interfaces/marcacao";
 import styles from "./styled.module.css";
-import Field from "@/ui/field/field";
-import Contacts from "@/components/contacts/contacts";
-import Address from "@/components/address/address";
+import Field from "@/ui/Field/field";
+import Contacts from "@/components/Contacts/contacts";
+import Address from "@/components/Address/address";
 
 export default function PrestadorServico({
   prestador,

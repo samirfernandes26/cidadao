@@ -9,9 +9,9 @@ import { useRouter } from "next/navigation";
 //   clearUserFromSession,
 // } from "@/utils/browserSession";
 
-import { login as doLogin } from "@/services/auth/login";
+import { login as doLogin } from "@/services/Auth/login";
 
-import type { User } from "@/models/auth";
+import type { User } from "@/interfaces/auth";
 
 type Status = "loading" | "authenticated" | "unauthenticated";
 

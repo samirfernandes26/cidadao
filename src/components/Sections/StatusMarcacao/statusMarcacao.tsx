@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "./styled.module.css";
-import Field from "@/ui/field/field";
-import Badge from "@/ui/badge/badge";
+import Field from "@/ui/Field/field";
+import Badge from "@/ui/Badge/badge";
 
 export default function StatusMarcacao({
   status,

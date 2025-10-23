@@ -1,10 +1,10 @@
 "use client";
 import { usePerfilForm } from "@/hooks/usePerfilForm/usePerfilForm";
 import styles from "./perfil.module.css";
-import Section from "@/components/sections/perfilSection/perfilSection";
-import InputField from "@/components/Form/inputField/inputField";
-import PasswordField from "@/components/Form/passwordField/passwordField";
-import ActionsBar from "@/components/actionsBar/perfinalActionsBar";
+import Section from "@/components/Sections/PerfilSection/perfilSection";
+import InputField from "@/components/Form/InputField/inputField";
+import PasswordField from "@/components/Form/PasswordField/passwordField";
+import ActionsBar from "@/components/ActionsBar/perfinalActionsBar";
 
 export default function PerfilPage() {
   const {

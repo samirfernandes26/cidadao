@@ -1,5 +1,5 @@
 import React from "react";
-import type { Endereco } from "@/models/marcacao";
+import type { Endereco } from "@/interfaces/marcacao";
 import styles from "./styled.module.css";
 
 export default function Address({ endereco }: { endereco: Endereco | null }) {

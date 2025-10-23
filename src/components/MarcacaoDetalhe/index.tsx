@@ -1,13 +1,13 @@
 import React from "react";
 import { useRouter } from "next/navigation";
-import type { Marcacao } from "@/models/marcacao";
+import type { Marcacao } from "@/interfaces/marcacao";
 import styles from "./styled.module.css";
-import Section from "@/ui/section/section";
-import InformacoesBasicas from "@/components/sections/InformacoesBasicas/InformacoesBasicas";
-import UbsSolicitante from "@/components/sections/ubsSolicitante/ubsSolicitante";
-import StatusMarcacao from "@/components/sections/statusMarcacao/statusMarcacao";
-import PrestadorServico from "@/components/sections/prestadorServico/prestadorServico";
-import Procedimentos from "@/components/sections/procedimentos/procedimentos";
+import Section from "../Sections/PerfilSection/perfilSection";
+import InformacoesBasicas from "../Sections/InformacoesBasicas/InformacoesBasicas";
+import Procedimentos from "../Sections/Procedimentos/procedimentos";
+import UbsSolicitante from "../Sections/UbsSolicitante/ubsSolicitante";
+import StatusMarcacao from "../Sections/StatusMarcacao/statusMarcacao";
+import PrestadorServico from "../Sections/PrestadorServico/prestadorServico";
 
 export default function MarcacaoDetalhe({ marcacao }: { marcacao: Marcacao }) {
   const router = useRouter();

@@ -3,7 +3,7 @@
 import { cookies } from "next/headers";
 import axios, { HttpStatusCode } from "axios";
 
-import { User } from "@/models/auth";
+import { User } from "@/interfaces/auth";
 
 interface LoginResponse {
   token: string;

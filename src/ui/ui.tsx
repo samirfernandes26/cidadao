@@ -1,4 +1,4 @@
-import Badge from "@/ui/badge/badge";
-import Field from "@/ui/field/field";
+import Badge from "@/ui/Badge/badge";
+import Field from "@/ui/Field/field";
 
 export { Badge, Field };

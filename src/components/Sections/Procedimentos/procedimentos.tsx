@@ -1,5 +1,5 @@
 import React from "react";
-import type { Procedimento } from "@/models/marcacao";
+import type { Procedimento } from "@/interfaces/marcacao";
 import styles from "./styled.module.css";
 
 export default function Procedimentos({ itens }: { itens: Procedimento[] }) {

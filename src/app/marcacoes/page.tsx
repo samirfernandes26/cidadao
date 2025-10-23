@@ -2,14 +2,14 @@
 // src/app/dashboard/page.tsx
 import ProcedimentoCard from "@/components/ProcedimentoCardCss";
 
-import type { Marcacao } from "@/models/marcacao";
+import type { Marcacao } from "@/interfaces/marcacao";
 
-import type { Procedimento } from "@/models";
-import getMarcacoesService from "@/services/marcacao/marcacao_service";
+import type { Procedimento } from "@/interfaces";
+import getMarcacoesService from "@/services/Marcacao/marcacao_service";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import styles from "./marcacoes.module.css";
-import { logoutService } from "@/services/auth/logout_service";
+import { logoutService } from "@/services/Auth/logout_service";
 
 function salvarMarcacaoSession(marcacao: Marcacao) {
   if (typeof window === "undefined" || !marcacao?.agendamento_id) return;

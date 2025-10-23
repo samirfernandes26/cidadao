@@ -1,8 +1,8 @@
 import React from "react";
-import type { Instituicao } from "@/models/marcacao";
-import Field from "@/ui/field/field";
-import Contacts from "@/components/contacts/contacts";
-import Address from "@/components/address/address";
+import type { Instituicao } from "@/interfaces/marcacao";
+import Field from "@/ui/Field/field";
+import Contacts from "@/components/Contacts/contacts";
+import Address from "@/components/Address/address";
 import styles from "./styled.module.css";
 
 export default function UbsSolicitante({ ubs }: { ubs: Instituicao | null }) {

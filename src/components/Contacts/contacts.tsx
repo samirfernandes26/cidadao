@@ -1,5 +1,5 @@
 import React from "react";
-import type { Contato } from "@/models/marcacao";
+import type { Contato } from "@/interfaces/marcacao";
 import styles from "./styled.module.css";
 
 export default function Contacts({ contato }: { contato: Contato | null }) {

@@ -2,7 +2,7 @@
 import { InputHTMLAttributes, useState } from "react";
 import styles from "./style.module.css";
 import { checkPassword, PasswordChecks } from "@/utils/validators";
-import RequirementsList from "../requirementsList/RequirementsList";
+import RequirementsList from "../RequirementsList/RequirementsList";
 
 type Props = {
   label: string;

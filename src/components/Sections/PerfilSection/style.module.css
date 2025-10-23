@@ -3,10 +3,11 @@
   border-radius: 12px;
   padding: clamp(14px, 1.2vw, 20px);
   background: #fff;
+  margin: 0 0 16px;
 }
 
 .sectionTitle {
-  margin: 0 0 12px;
+  margin: 0 0 16px;
   color: #111827;
   font-weight: 600;
   font-size: clamp(1rem, 1.6vw, 1.125rem);

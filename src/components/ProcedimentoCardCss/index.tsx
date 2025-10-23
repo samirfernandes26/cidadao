@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import React from "react";
-import type { Procedimento } from "@/models";
+import type { Procedimento } from "@/interfaces";
 import styles from "./ProcedimentoCardCss.module.css";
 
 type Props = {

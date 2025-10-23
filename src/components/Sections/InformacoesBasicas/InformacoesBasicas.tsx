@@ -1,5 +1,5 @@
 import React from "react";
-import type { Marcacao } from "@/models/marcacao";
+import type { Marcacao } from "@/interfaces/marcacao";
 import styles from "./styled.module.css";
 import { safeFormat } from "@/utils/safeFormat";
 import { Field, Badge } from "@/ui/ui";
