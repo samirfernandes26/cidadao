@@ -6,6 +6,9 @@ import { useRouter } from "next/navigation";
 
 import styles from "./atualizar_senha.module.css";
 import { useAuth } from "@/hooks/auth";
+import RequirementsList from "@/components/Form/requirementsList/RequirementsList";
+import PasswordField from "@/components/Form/passwordField/passwordField";
+import { usePerfilForm } from "@/hooks/usePerfilForm/usePerfilForm";
 
 /* ===== Ícones (SVG inline) ===== */
 function EyeIcon(props: React.SVGProps<SVGSVGElement>) {
@@ -37,105 +40,20 @@ function EyeOffIcon(props: React.SVGProps<SVGSVGElement>) {
 }
 
 export default function AtualizarSenhaPage() {
-  const [showNew, setShowNew] = useState(false);
-  const [showConf, setShowConf] = useState(false);
+  const {
+    novaSenha,
+    confirmarSenha,
+    setNovaSenha,
+    setConfirmarSenha,
+    ErrorNovaSenha,
+    ErrorConfirmaSenha,
+    loading,
+    submitUpdatePassword,
+  } = usePerfilForm();
 
-  const [loading, setLoading] = useState(false);
-  const [okMsg, setOkMsg] = useState<string | null>(null);
-  const [errMsg, setErrMsg] = useState<string | null>(null);
-  const [senha, setSenha] = useState("");
-  const [confirmaSenha, setConfirmaSenha] = useState("");
-
-  const { requiresPasswordChange } = useAuth();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (requiresPasswordChange === false) {
-      router.push("/marcacoes");
-    }
-  }, [requiresPasswordChange, router]);
-
-  // Requisitos de senha
-  const requisitos = [
-    {
-      label: "Mínimo de 8 caracteres",
-      test: (s: string) => s.length >= 8,
-    },
-    {
-      label: "Pelo menos 1 símbolo especial",
-      test: (s: string) => /[^A-Za-z0-9]/.test(s),
-    },
-    {
-      label: "Pelo menos 1 número",
-      test: (s: string) => /[0-9]/.test(s),
-    },
-    {
-      label: "Pelo menos 1 letra maiúscula",
-      test: (s: string) => /[A-Z]/.test(s),
-    },
-    {
-      label: "Pelo menos 1 letra minúscula",
-      test: (s: string) => /[a-z]/.test(s),
-    },
-  ];
-
-  const requisitosVisuais = [
-    ...requisitos.map((req) => ({
-      label: req.label,
-      ok: req.test(senha),
-    })),
-    {
-      label: "Senhas conferem",
-      ok: senha.length > 0 && senha === confirmaSenha,
-    },
-  ];
-
-  function validate(newPass: string, conf: string) {
-    for (const req of requisitos) {
-      if (!req.test(newPass)) return `A senha não atende: ${req.label}`;
-    }
-    if (newPass !== conf) return "A confirmação deve ser igual à nova senha.";
-    return null;
-  }
-
-  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setErrMsg(null);
-    setOkMsg(null);
-
-    const fd = new FormData(e.currentTarget);
-    const new_password = String(fd.get("new_password") || "");
-    const confirm_password = String(fd.get("confirm_password") || "");
-
-    const v = validate(new_password, confirm_password);
-    if (v) {
-      setErrMsg(v);
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const result = await requiresPasswordChangeService(
-        new_password,
-        confirm_password
-      );
-      if (result === true) {
-        if (typeof window !== "undefined") {
-          sessionStorage.setItem("requires_password_change", "false");
-        }
-        router.push("/marcacoes");
-        return;
-      }
-      setOkMsg("Senha atualizada com sucesso!");
-      (e.target as HTMLFormElement).reset();
-    } catch (error: unknown) {
-      setErrMsg(
-        (error as Error)?.message ||
-          "Não foi possível atualizar a senha. Tente novamente."
-      );
-    } finally {
-      setLoading(false);
-    }
+    await submitUpdatePassword();
   }
 
   return (
@@ -159,109 +77,29 @@ export default function AtualizarSenhaPage() {
         </p>
 
         <form onSubmit={onSubmit} className={styles.form} noValidate>
-          <label className={styles.label}>
-            <span className={styles.labelText}>Nova senha</span>
-            <input
-              name="new_password"
-              type={showNew ? "text" : "password"}
-              className={styles.input}
-              placeholder="Mínimo de 8 caracteres"
-              autoComplete="new-password"
-              minLength={8}
-              required
-              value={senha}
-              onChange={(e) => {
-                setSenha(e.target.value);
-                setErrMsg(null);
-              }}
-            />
-            <button
-              type="button"
-              className={styles.showBtn}
-              onClick={() => setShowNew((v) => !v)}
-              aria-label={showNew ? "Ocultar senha" : "Mostrar senha"}
-              aria-pressed={showNew}
-              title={showNew ? "Ocultar senha" : "Mostrar senha"}
-            >
-              {showNew ? (
-                <EyeOffIcon className={styles.eye} />
-              ) : (
-                <EyeIcon className={styles.eye} />
-              )}
-            </button>
-          </label>
+          <PasswordField
+            name="novaSenha"
+            label="Nova senha"
+            value={novaSenha}
+            confirmValue={confirmarSenha}
+            onChange={setNovaSenha}
+            requiredIf={!!confirmarSenha}
+            error={ErrorNovaSenha}
+            showChecklistAgainst="confirm"
+            placeholder="Mínimo de 8 caracteres"
+          />
 
-          <ul className={styles.hints} style={{ marginBottom: 8 }}>
-            {requisitosVisuais.map((req, idx) => (
-              <li
-                key={idx}
-                style={{ display: "flex", alignItems: "center", gap: 6 }}
-              >
-                <span
-                  style={{
-                    display: "inline-block",
-                    width: 12,
-                    height: 12,
-                    borderRadius: "50%",
-                    background: req.ok ? "#2ecc40" : "#ff4136",
-                    border: "1px solid #ccc",
-                    marginRight: 6,
-                  }}
-                  aria-label={
-                    req.ok ? "Requisito atendido" : "Requisito não atendido"
-                  }
-                />
-                {req.label}
-              </li>
-            ))}
-          </ul>
-
-          <label className={styles.label}>
-            <span className={styles.labelText}>Confirmar nova senha</span>
-            <input
-              name="confirm_password"
-              type={showConf ? "text" : "password"}
-              className={styles.input}
-              placeholder="Repita a nova senha"
-              autoComplete="new-password"
-              minLength={8}
-              required
-              value={confirmaSenha}
-              onChange={(e) => {
-                setConfirmaSenha(e.target.value);
-                setErrMsg(null);
-              }}
-            />
-            <button
-              type="button"
-              className={styles.showBtn}
-              onClick={() => setShowConf((v) => !v)}
-              aria-label={showConf ? "Ocultar senha" : "Mostrar senha"}
-              aria-pressed={showConf}
-              title={showConf ? "Ocultar senha" : "Mostrar senha"}
-            >
-              {showConf ? (
-                <EyeOffIcon className={styles.eye} />
-              ) : (
-                <EyeIcon className={styles.eye} />
-              )}
-            </button>
-          </label>
-
-          <ul className={styles.hints}>
-            <li>Evite usar dados pessoais (ex.: datas, nomes)</li>
-          </ul>
-
-          {errMsg && (
-            <p className={styles.error} aria-live="assertive">
-              {errMsg}
-            </p>
-          )}
-          {okMsg && (
-            <p className={styles.success} aria-live="polite">
-              {okMsg}
-            </p>
-          )}
+          <PasswordField
+            name="confirmarSenha"
+            label="Confirmar nova senha"
+            value={confirmarSenha}
+            confirmValue={novaSenha}
+            onChange={setConfirmarSenha}
+            requiredIf={!!novaSenha}
+            error={ErrorConfirmaSenha}
+            placeholder="Repita a nova senha"
+            visibilityValidators={false}
+          />
 
           <button type="submit" className={styles.submit} disabled={loading}>
             {loading ? "Salvando..." : "Salvar nova senha"}

@@ -2,6 +2,7 @@
 import { useMemo, useState } from "react";
 import { checkPassword, emailRegex, passwordIsValid } from "@/utils/validators";
 import updatePerfilService from "@/services/perfil/update_perfil_service";
+import requiresPasswordChangeService from "@/services/auth/requires_password_change_service";
 
 export function usePerfilForm() {
   const [email, setEmail] = useState("");
@@ -68,6 +69,44 @@ export function usePerfilForm() {
 
       console.log("Resultado da atualização do perfil:", result);
       return result;
+    } catch (error) {
+      console.error("Erro ao atualizar a senha:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function submitUpdatePassword() {
+    setLoading(true);
+    setErrorNovaSenha("");
+    setErrorConfirmaSenha("");
+
+    try {
+      // regras cruzadas nova/confirmar
+      if (novaSenha && !confirmarSenha)
+        setErrorConfirmaSenha("A confirmação de senha é obrigatória.");
+      if (confirmarSenha && !novaSenha)
+        setErrorNovaSenha("A nova senha é obrigatória.");
+
+      if (novaSenha || confirmarSenha) {
+        if (!passwordIsValid(passwordChecks)) {
+          setErrorNovaSenha(
+            "A atualização de senha não cumpre todos os requisitos necessários."
+          );
+        }
+      }
+
+      const hasErrors =
+        [ErrorNovaSenha, ErrorConfirmaSenha].some(Boolean) ||
+        (novaSenha && !confirmarSenha) ||
+        (confirmarSenha && !novaSenha) ||
+        ((novaSenha || confirmarSenha) && !passwordIsValid(passwordChecks));
+      if (hasErrors) return;
+
+      await requiresPasswordChangeService(novaSenha, confirmarSenha);
+      return;
+    } catch (error) {
+      console.error("Erro ao atualizar a senha:", error);
     } finally {
       setLoading(false);
     }
@@ -98,5 +137,6 @@ export function usePerfilForm() {
     loading,
     // actions
     submit,
+    submitUpdatePassword,
   } as const;
 }

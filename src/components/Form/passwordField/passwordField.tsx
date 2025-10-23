@@ -12,7 +12,8 @@ type Props = {
   onChange: (v: string) => void;
   error?: string;
   showChecklistAgainst?: string; // compara com confirmar ou nova
-  requiredIf?: boolean; // se true, adiciona required
+  requiredIf?: boolean;
+  visibilityValidators?: boolean;
 } & Omit<
   InputHTMLAttributes<HTMLInputElement>,
   "type" | "value" | "onChange" | "name"
@@ -27,6 +28,7 @@ export default function PasswordField({
   error,
   showChecklistAgainst,
   requiredIf,
+  visibilityValidators,
   ...rest
 }: Props) {
   const [focus, setFocus] = useState(false);
@@ -64,7 +66,9 @@ export default function PasswordField({
           {error}
         </span>
       )}
-      <RequirementsList checks={checks} visible={focus || value.length > 0} />
+      {visibilityValidators != false && (
+        <RequirementsList checks={checks} visible={focus || value.length > 0} />
+      )}
     </label>
   );
 }
