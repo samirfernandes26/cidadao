@@ -2,6 +2,7 @@
 import MarcacaoDetalhe from "@/components/MarcacaoDetalhe";
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
+import { TopBar } from "@/components/TopBar/TopBar";
 
 export default function Page() {
   const params = useParams();
@@ -22,8 +23,11 @@ export default function Page() {
   if (!marcacao) return <div>Carregando...</div>;
 
   return (
-    <div className="min-h-[60vh] bg-slate-50">
-      <MarcacaoDetalhe marcacao={marcacao} />
-    </div>
+    <>
+      <TopBar titulo="Detalhes da marcação" />
+      <div className="min-h-[60vh] bg-slate-50">
+        <MarcacaoDetalhe marcacao={marcacao} />
+      </div>
+    </>
   );
 }

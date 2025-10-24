@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import styles from "./marcacoes.module.css";
 import { logoutService } from "@/services/Auth/logout_service";
+import { TopBar } from "@/components/TopBar/TopBar";
 
 function salvarMarcacaoSession(marcacao: Marcacao) {
   if (typeof window === "undefined" || !marcacao?.agendamento_id) return;
@@ -105,27 +106,30 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <main className="p-4 sm:p-6">
-      <div className={styles.header}>
-        <h1 className="mb-4 text-2xl font-bold">Minhas marcações</h1>
-        <button onClick={handleLogout} className={styles.logoutBtn}>
-          Sair
-        </button>
-      </div>
-      {loading && <p>Carregando marcações...</p>}
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-1 xl:grid-cols-2">
-        {marcacoes.map((m: Marcacao) => (
-          <ProcedimentoCard
-            key={m.agendamento_id}
-            data={toCardData(m)}
-            onDetalhesClick={() => {
-              salvarMarcacaoSession(m);
-              router.push(`/marcacoes/${m.agendamento_id}`);
-            }}
-          />
-        ))}
-      </div>
-    </main>
+    <>
+      <TopBar titulo="Minhas marcações" />
+      <main className="p-4 sm:p-6">
+        <div className={styles.header}>
+          <h1 className="mb-4 text-2xl font-bold">Minhas marcações</h1>
+          <button onClick={handleLogout} className={styles.logoutBtn}>
+            Sair
+          </button>
+        </div>
+        {loading && <p>Carregando marcações...</p>}
+        {error && <p style={{ color: "red" }}>{error}</p>}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-1 xl:grid-cols-2">
+          {marcacoes.map((m: Marcacao) => (
+            <ProcedimentoCard
+              key={m.agendamento_id}
+              data={toCardData(m)}
+              onDetalhesClick={() => {
+                salvarMarcacaoSession(m);
+                router.push(`/marcacoes/${m.agendamento_id}`);
+              }}
+            />
+          ))}
+        </div>
+      </main>
+    </>
   );
 }

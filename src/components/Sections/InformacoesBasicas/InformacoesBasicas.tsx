@@ -37,6 +37,12 @@ export default function InformacoesBasicas({
           {marcacao.posicao_na_fila ?? "—"}
         </span>
       </Field>
+
+      <Field label="Codigo agendamento">
+        <span className={styles.labeledValue}>
+          {marcacao.agendamento_id ?? "—"}
+        </span>
+      </Field>
     </div>
   );
 }
