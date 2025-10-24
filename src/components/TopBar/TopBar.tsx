@@ -43,7 +43,7 @@ export const TopBar = ({ titulo }: TopBarProps) => {
           Marcações
         </Link>
         <button onClick={handleLogout} className={styles.navButton}>
-          Sair da conta
+          Sair
         </button>
       </nav>
     </header>

@@ -25,26 +25,6 @@
   box-shadow: 0 2px 4px rgb(0 0 0 / 0.1);
 }
 
-/* Direção em coluna no mobile (título em cima, menu embaixo) */
-@media (max-width: 640px) {
-  .topbar {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.5rem;
-  }
-
-  /* ✅ Centraliza o título quando quebrar para duas linhas */
-  .logo {
-    display: flex;
-    justify-content: center;
-  }
-
-  .title {
-    text-align: center;
-    width: 100%;
-  }
-}
-
 /* ====== Branding / Título ====== */
 .logo {
   display: flex;
@@ -66,21 +46,6 @@
   align-items: center;
   gap: clamp(0.5rem, 1.5vw, 1.25rem);
   flex-wrap: wrap;
-}
-
-/* No mobile: ocupa toda a largura e permite rolagem horizontal se precisar */
-@media (max-width: 640px) {
-  .nav {
-    width: 100%;
-    justify-content: end; /* mantém os botões à direita */
-    overflow-x: auto;
-    padding-bottom: 2px;
-  }
-
-  /* esconder barra de rolagem quando possível */
-  .nav::-webkit-scrollbar {
-    height: 0;
-  }
 }
 
 /* Links e botão do menu — mesma cara */
@@ -117,6 +82,68 @@
   outline: none;
   box-shadow: var(--focus-ring);
   border-radius: 6px;
+}
+
+@media (max-width: 480px) {
+  .topbar {
+    /* flex-direction: column; */
+    align-items: stretch;
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  .title {
+    font-size: 1.5rem;
+    line-height: 1.15;
+    width: 100%;
+  }
+}
+
+/* Direção em coluna no mobile (título em cima, menu embaixo) */
+@media (max-width: 640px) {
+  .topbar {
+    /* flex-direction: column; */
+    align-items: stretch;
+    gap: 0.3rem;
+    width: 100%;
+  }
+
+  .title {
+    font-size: 1rem;
+    line-height: 1.15;
+    width: 100%;
+  }
+
+  /* links/botão do menu menores */
+  .navLink,
+  .navButton {
+    font-size: 0.85rem; /* ~13px */
+  }
+
+  /* opcional: aperta os espaçamentos */
+  .topbar {
+    padding: 0.5rem 0.75rem;
+  }
+  .nav {
+    gap: 0.5rem;
+  }
+
+  /* .logo {
+    display: flex;
+    justify-content: center;
+  } */
+
+  .nav {
+    /* width: 100%; */
+    justify-content: end;
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+
+  /* esconder barra de rolagem quando possível */
+  .nav::-webkit-scrollbar {
+    height: 0;
+  }
 }
 
 /* Ajustes de espaçamento no desktop grande */
