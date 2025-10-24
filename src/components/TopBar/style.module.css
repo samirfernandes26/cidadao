@@ -1,31 +1,127 @@
+:root {
+  --topbar-bg: #0b75d7;
+  --text-on-topbar: #fff;
+
+  /* para foco/teclado */
+  --focus-ring: 0 0 0 2px rgba(255, 255, 255, 0.65);
+}
+
+/* ====== Layout base ====== */
 .topbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 2rem;
-  background-color: #0b75d7;
-  color: white;
-  width: 100%;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   position: sticky;
   top: 0;
   z-index: 1000;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  /* padding horizontal fluido: 16px → 32px conforme viewport */
+  padding: clamp(0.75rem, 1.4vw, 1rem) clamp(1rem, 2.5vw, 2rem);
+
+  width: 100%;
+  color: var(--text-on-topbar);
+  background: var(--topbar-bg);
+  box-shadow: 0 2px 4px rgb(0 0 0 / 0.1);
 }
 
-.logo a {
-  color: white;
+/* Direção em coluna no mobile (título em cima, menu embaixo) */
+@media (max-width: 640px) {
+  .topbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  /* ✅ Centraliza o título quando quebrar para duas linhas */
+  .logo {
+    display: flex;
+    justify-content: center;
+  }
+
+  .title {
+    text-align: center;
+    width: 100%;
+  }
+}
+
+/* ====== Branding / Título ====== */
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+/* Título fluido: ~18px → 28px */
+.title {
+  margin: 0;
+  font-weight: 700;
+  color: var(--text-on-topbar);
+  font-size: clamp(1.125rem, 1rem + 1.5vw, 1.75rem);
+  line-height: 1.2;
+}
+
+/* ====== Navegação ====== */
+.nav {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.5rem, 1.5vw, 1.25rem);
+  flex-wrap: wrap;
+}
+
+/* No mobile: ocupa toda a largura e permite rolagem horizontal se precisar */
+@media (max-width: 640px) {
+  .nav {
+    width: 100%;
+    justify-content: end; /* mantém os botões à direita */
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+
+  /* esconder barra de rolagem quando possível */
+  .nav::-webkit-scrollbar {
+    height: 0;
+  }
+}
+
+/* Links e botão do menu — mesma cara */
+.navLink,
+.navButton {
+  color: var(--text-on-topbar);
   text-decoration: none;
-  font-size: 1.5rem;
-  font-weight: bold;
+  background: transparent;
+  border: 0;
+  padding: 0.35rem 0.25rem;
+
+  /* fonte fluida: ~14px → 16px */
+  font-size: clamp(0.875rem, 0.75rem + 0.6vw, 1rem);
+  font-weight: 500;
+  line-height: 1.2;
+
+  cursor: pointer;
+  transition:
+    opacity 0.15s ease,
+    text-decoration-color 0.15s ease;
 }
 
-.nav a {
-  color: white;
-  text-decoration: none;
-  margin-left: 1.5rem;
-  font-size: 1rem;
-}
-
-.nav a:hover {
+/* Hover com contraste suave */
+.navLink:hover,
+.navButton:hover {
   text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Foco acessível */
+.navLink:focus-visible,
+.navButton:focus-visible,
+.title:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: 6px;
+}
+
+/* Ajustes de espaçamento no desktop grande */
+@media (min-width: 1280px) {
+  .nav {
+    gap: 1.5rem;
+  }
 }

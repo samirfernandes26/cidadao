@@ -65,22 +65,6 @@ export default function Dashboard() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  async function handleLogout() {
-    try {
-      const response = await logoutService();
-      if (typeof window !== "undefined") {
-        sessionStorage.clear();
-      }
-      if (response) {
-        router.replace("/auth/login");
-      } else {
-        alert("Erro ao sair. Tente novamente.");
-      }
-    } catch (error: unknown) {
-      alert("Erro ao sair. Tente novamente. " + (error as Error)?.message);
-    }
-  }
-
   useEffect(() => {
     let isMounted = true;
     setLoading(true);
@@ -109,12 +93,6 @@ export default function Dashboard() {
     <>
       <TopBar titulo="Minhas marcações" />
       <main className="p-4 sm:p-6">
-        <div className={styles.header}>
-          <h1 className="mb-4 text-2xl font-bold">Minhas marcações</h1>
-          <button onClick={handleLogout} className={styles.logoutBtn}>
-            Sair
-          </button>
-        </div>
         {loading && <p>Carregando marcações...</p>}
         {error && <p style={{ color: "red" }}>{error}</p>}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-1 xl:grid-cols-2">
