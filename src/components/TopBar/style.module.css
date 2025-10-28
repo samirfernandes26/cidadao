@@ -1,9 +1,11 @@
 :root {
   --topbar-bg: #0b75d7;
   --text-on-topbar: #fff;
-
-  /* para foco/teclado */
   --focus-ring: 0 0 0 2px rgba(255, 255, 255, 0.65);
+
+  --panel-bg: #fff;
+  --panel-text: #111827;
+  --panel-border: #e5e7eb;
 }
 
 /* ====== Layout base ====== */
@@ -16,13 +18,15 @@
   align-items: center;
   justify-content: space-between;
 
-  /* padding horizontal fluido: 16px → 32px conforme viewport */
-  padding: clamp(0.75rem, 1.4vw, 1rem) clamp(1rem, 2.5vw, 2rem);
-
+  padding: clamp(1.5rem, 1.4vw, 1rem) clamp(1rem, 2.5vw, 2rem);
   width: 100%;
+
   color: var(--text-on-topbar);
   background: var(--topbar-bg);
   box-shadow: 0 2px 4px rgb(0 0 0 / 0.1);
+
+  /* p/ posicionar o dropdown */
+  position: sticky;
 }
 
 /* ====== Branding / Título ====== */
@@ -31,7 +35,7 @@
   align-items: center;
 }
 
-/* Título fluido: ~18px → 28px */
+/* Título fluido */
 .title {
   margin: 0;
   font-weight: 700;
@@ -40,7 +44,7 @@
   line-height: 1.2;
 }
 
-/* ====== Navegação ====== */
+/* ====== Navegação (desktop) ====== */
 .nav {
   display: flex;
   align-items: center;
@@ -48,7 +52,6 @@
   flex-wrap: wrap;
 }
 
-/* Links e botão do menu — mesma cara */
 .navLink,
 .navButton {
   color: var(--text-on-topbar);
@@ -56,26 +59,19 @@
   background: transparent;
   border: 0;
   padding: 0.35rem 0.25rem;
-
-  /* fonte fluida: ~14px → 16px */
   font-size: clamp(0.875rem, 0.75rem + 0.6vw, 1rem);
   font-weight: 500;
   line-height: 1.2;
-
   cursor: pointer;
   transition:
     opacity 0.15s ease,
     text-decoration-color 0.15s ease;
 }
-
-/* Hover com contraste suave */
 .navLink:hover,
 .navButton:hover {
   text-decoration: underline;
   text-underline-offset: 3px;
 }
-
-/* Foco acessível */
 .navLink:focus-visible,
 .navButton:focus-visible,
 .title:focus-visible {
@@ -84,71 +80,97 @@
   border-radius: 6px;
 }
 
-@media (max-width: 480px) {
-  .topbar {
-    /* flex-direction: column; */
-    align-items: stretch;
-    gap: 0.5rem;
-    width: 100%;
-  }
-
-  .title {
-    font-size: 1.5rem;
-    line-height: 1.15;
-    width: 100%;
-  }
+/* ====== Botão sanduíche (mobile) ====== */
+.menuBtn {
+  display: none; /* escondido no desktop */
+  color: var(--text-on-topbar);
+  background: transparent;
+  border: 0;
+  padding: 0.35rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.menuBtn:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
 }
 
-/* Direção em coluna no mobile (título em cima, menu embaixo) */
+/* ====== Dropdown mobile ====== */
+.mobileMenu {
+  position: absolute;
+  top: 100%;
+  right: clamp(1rem, 2.5vw, 2rem);
+
+  display: none;
+  min-width: 200px;
+
+  background: var(--panel-bg);
+  color: var(--panel-text);
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  margin-top: 8px;
+  padding: 6px;
+  box-shadow: 0 10px 30px -12px rgb(0 0 0 / 0.3);
+
+  z-index: 1100;
+}
+.mobileMenuOpen {
+  display: block;
+}
+
+.mobileItem {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  border: 0;
+  text-decoration: none;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+.mobileItem:hover,
+.mobileItem:focus-visible {
+  background: #f3f4f6; /* slate-100 */
+  outline: none;
+}
+.mobileDanger {
+  color: #b91c1c; /* red-700 */
+}
+
+/* ====== Regras para MOBILE ====== */
 @media (max-width: 640px) {
-  .topbar {
-    /* flex-direction: column; */
-    align-items: stretch;
-    gap: 0.3rem;
-    width: 100%;
+  /* esconde nav desktop, mostra botão */
+  .nav {
+    display: none;
+  }
+  .menuBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 
+  /* centraliza o título no mobile */
+  .topbar {
+    justify-content: center;
+  }
+  .logo {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .menuBtn {
+    position: absolute;
+    right: clamp(0.75rem, 2.5vw, 1rem);
+  }
+
+  /* tipografia menor no mobile (opcional) */
   .title {
     font-size: 1rem;
-    line-height: 1.15;
-    width: 100%;
   }
-
-  /* links/botão do menu menores */
-  .navLink,
-  .navButton {
-    font-size: 0.85rem; /* ~13px */
-  }
-
-  /* opcional: aperta os espaçamentos */
-  .topbar {
-    padding: 0.5rem 0.75rem;
-  }
-  .nav {
-    gap: 0.5rem;
-  }
-
-  /* .logo {
-    display: flex;
-    justify-content: center;
-  } */
-
-  .nav {
-    /* width: 100%; */
-    justify-content: end;
-    overflow-x: auto;
-    padding-bottom: 2px;
-  }
-
-  /* esconder barra de rolagem quando possível */
-  .nav::-webkit-scrollbar {
-    height: 0;
-  }
-}
-
-/* Ajustes de espaçamento no desktop grande */
-@media (min-width: 1280px) {
-  .nav {
-    gap: 1.5rem;
+  .mobileItem {
+    font-size: 0.9rem;
   }
 }
