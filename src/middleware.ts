@@ -1,17 +1,27 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-import { withAuth } from "@/middlewares/auth";
+// o middleware.ts estava causando um loop de login infinito.
 
-const middlewares = [withAuth];
+// Ele estava em conflito direto com o seu AuthContext.tsx:
+
+// O middleware.ts roda no servidor do Next.js.
+
+// O seu login (o AuthContext.tsx) funciona no navegador (cliente) e usa o sessionStorage.
+
+// O servidor não consegue ler o sessionStorage do navegador.
+
+// Resultado: Após o login, o AuthContext te enviava para /test-api. 
+// O middleware.ts (no servidor) interceptava isso, não via o sessionStorage, 
+// achava que você não estava logado e mandava de volta para /auth/login, causando o loop.
+
+const middlewares: ((request: NextRequest) => NextResponse)[] = []; 
 
 export function middleware(request: NextRequest) {
-  const response = NextResponse.next(); // Resposta inicial
+  const response = NextResponse.next(); 
 
   for (const mw of middlewares) {
-    const result = mw(request); // Supondo que seus middlewares retornam NextResponse
+    const result = mw(request); 
 
-    // Se o middleware retornar uma resposta que não seja .next() (como redirect ou rewrite),
-    // pare o encadeamento e retorne essa resposta imediatamente.
     if (result && result !== NextResponse.next()) {
       return result;
     }
@@ -21,11 +31,7 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  // Regex de Negative Lookahead
   matcher: [
-    /* * O Middleware será executado em TODAS as rotas, EXCETO aquelas que
-     * começam com um dos padrões listados no (?! ... )
-     */
     "/((?!api|_next/static|_next/image|favicon.ico|login|register|auth/login).*)",
   ],
 };

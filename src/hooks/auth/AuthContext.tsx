@@ -1,17 +1,10 @@
 "use client";
 
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
-
-// import {
-//   readUserFromSession,
-//   saveUserToSession,
-//   clearUserFromSession,
-// } from "@/utils/browserSession";
-
-import { login as doLogin } from "@/services/Auth/login";
-
+import { useRouter, usePathname } from "next/navigation";
+import { login as doLogin, IResponse } from "@/services/Auth/login";
 import type { User } from "@/interfaces/auth";
+import { testLogout } from "@/services/Auth/logout_service";
 
 type Status = "loading" | "authenticated" | "unauthenticated";
 
@@ -27,32 +20,47 @@ const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const pathname = usePathname();
+
   const [status, setStatus] = useState<Status>("loading");
   const [user, setUser] = useState<User>({} as User);
   const [requiresPasswordChange, setRequiresPasswordChange] =
     useState<boolean>(false);
 
   async function login(login: string, password: string) {
-    const { type, user, requiresPasswordChange } = await doLogin(
+    const result: IResponse = await doLogin(
       login,
       password
     );
 
-    if (type === "success") {
-      sessionStorage.setItem("user_info", JSON.stringify(user));
+    if (result.type === "success") {
+      sessionStorage.setItem("user_info", JSON.stringify(result.user));
       sessionStorage.setItem(
         "requires_password_change",
-        requiresPasswordChange ? "true" : "false"
+        result.requiresPasswordChange ? "true" : "false"
       );
 
-      setRequiresPasswordChange(!!requiresPasswordChange);
-      setUser(user!);
+      setRequiresPasswordChange(!!result.requiresPasswordChange);
+      setUser(result.user!);
       setStatus("authenticated");
+    } else {
+      throw new Error(result.message);
     }
   }
 
   const logout = async () => {
-    // TODO: chamar serviço de logout
+    try {
+      await testLogout(); 
+    } catch (error) {
+      console.error("Falha ao deslogar da API, limpando sessão local mesmo assim.", error);
+    } finally {
+      sessionStorage.removeItem("user_info");
+      sessionStorage.removeItem("requires_password_change");
+      setUser({} as User);
+      setRequiresPasswordChange(false);
+      
+      setStatus("unauthenticated"); 
+    }
   };
 
   const value = useMemo(
@@ -61,25 +69,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 
   useEffect(() => {
-    const userInfo = sessionStorage.getItem("user_info");
-    const requiresPasswordChange = sessionStorage.getItem(
-      "requires_password_change"
-    );
+    if (status === "loading") return;
 
-    if (!!userInfo) {
-      setUser(JSON.parse(userInfo));
-      setStatus("authenticated");
-      setRequiresPasswordChange(requiresPasswordChange === "true");
-    }
-  }, []);
+    const rotasPublicas = ["/auth/login"];
+    const rotaAtualEhPublica = rotasPublicas.includes(pathname);
 
-  useEffect(() => {
     if (status === "authenticated") {
+
       if (requiresPasswordChange) {
         router.push("/auth/atualizar-senha");
+      } else if (rotaAtualEhPublica) {
+        router.push("/test-api"); 
+      }
+      
+    } else {
+      
+      if (!rotaAtualEhPublica && pathname !== "/auth/atualizar-senha") {
+        router.push("/auth/login");
       }
     }
-  }, [status, requiresPasswordChange, router]);
+
+  }, [status, requiresPasswordChange, router, pathname]); 
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

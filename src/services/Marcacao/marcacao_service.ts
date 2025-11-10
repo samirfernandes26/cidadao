@@ -11,15 +11,24 @@ export default async function getMarcacoesService(): Promise<Marcacao[]> {
   if (!token) throw new Error("Você não está autenticado");
 
   try {
-    const base = "https://teste1.versasaude.com.br/api";
+    const base = "http://desenvolvimento.versasaude.local/api";
+
+    const allCookies = cookieStore.getAll();
+    const cookieHeader = allCookies.map((c) => `${c.name}=${c.value}`).join('; ');
+    const xsrf = cookieStore.get('XSRF-TOKEN')?.value;
+
+    const headers: Record<string, string> = {
+      'X-Requested-With': 'XMLHttpRequest',
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Cookie: cookieHeader,
+    };
+
+    if (xsrf) headers['X-XSRF-TOKEN'] = xsrf;
+    if (token?.value) headers['Authorization'] = `Bearer ${token.value}`;
 
     const response = await axios.get(`${base}/cidadao/marcacoes`, {
-      headers: {
-        "X-Requested-With": "XMLHttpRequest",
-        Authorization: `Bearer ${token.value}`,
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
+      headers,
       withCredentials: true,
     });
 
