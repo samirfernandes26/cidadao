@@ -5,51 +5,30 @@ import { HttpStatusCode } from "axios";
 
 const API_BASE_URL = "http://desenvolvimento.versasaude.local";
 const RENOVAR_SENHA_ROUTE = `${API_BASE_URL}/api/cidadao/renovar-senha`;
-const FRONTEND_ORIGIN = "http://desenvolvimento.versasaude.local";
 
 export default async function requiresPasswordChangeService(
   novaSenha: string,
   confirmarSenha: string
 ) {
-  console.log("--- SERVIÇO DE RENOVAR SENHA (fetch) INICIADO ---");
-
   const cookieStore = await cookies();
-  const sessionCookie = cookieStore.get("versasaude_session");
-  const xsrfCookie = cookieStore.get("XSRF-TOKEN");
 
-  if (!sessionCookie || !xsrfCookie) {
-    console.error(
-      "Erro ao renovar Senha: Cookie de sessão ou XSRF não encontrado."
-    );
+  const session = cookieStore.get("versasaude_session");
+  const xsrf = cookieStore.get("XSRF-TOKEN");
+
+  if (!session || !xsrf)
     throw new Error("Você não está autenticado ou sua sessão expirou.");
-  }
-
-  console.log("Renovar Senha: Cookies de sessão e XSRF encontrados.");
-  console.log(
-    ">>> RENOVAR (XSRF): Valor lido do cookieStore:",
-    xsrfCookie.value
-  );
 
   try {
-    console.log(
-      `Renovar Senha: Enviando formulário para: ${RENOVAR_SENHA_ROUTE}`
-    );
-
-    const finalCookieHeader = `versasaude_session=${sessionCookie.value}; XSRF-TOKEN=${xsrfCookie.value}`;
-
-    console.log(
-      ">>> RENOVAR (HEADER X-XSRF-TOKEN): Valor enviado:",
-      xsrfCookie.value
-    );
+    const cookieHeader = `versasaude_session=${session.value}; XSRF-TOKEN=${xsrf.value}`;
 
     const response = await fetch(RENOVAR_SENHA_ROUTE, {
       method: "POST",
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
-        Cookie: finalCookieHeader,
-        "X-XSRF-TOKEN": xsrfCookie.value,
-        Origin: FRONTEND_ORIGIN,
+        Cookie: cookieHeader,
+        "X-XSRF-TOKEN": xsrf.value,
+        Origin: API_BASE_URL,
       },
       body: JSON.stringify({
         nova_senha: novaSenha,
@@ -57,36 +36,39 @@ export default async function requiresPasswordChangeService(
       }),
     });
 
+    // Sucesso
     if (
-      response.status === HttpStatusCode.Ok ||
-      response.status === HttpStatusCode.NoContent
+      [HttpStatusCode.Ok, HttpStatusCode.NoContent].includes(response.status)
     ) {
-      console.log("Renovar Senha: Senha alterada com sucesso.");
-
       return true;
-    }
-
-    const errorData = await response.json().catch(() => ({}));
-
-    if (response.status === HttpStatusCode.Unauthorized) {
-      console.error("Erro 401 (Não autenticado)", errorData);
-      throw new Error("Não autenticado. Verifique o 'Origin' e os cookies.");
-    } else if (response.status === 419) {
-      console.error("Erro 419 (Token Mismatch)", errorData);
-      throw new Error("Erro de sessão. O token CSRF não correspondeu.");
-    } else if (response.status === HttpStatusCode.UnprocessableEntity) {
-      console.warn("Erro 422 (Validação)", errorData);
-      throw new Error(errorData.errors || "Erro de validação");
     } else {
-      console.error(`Erro inesperado: ${response.status}`, errorData);
-      throw new Error("Erro ao alterar a senha: " + response.statusText);
-    }
-  } catch (error: unknown) {
-    console.error("Erro ao 'enviar' o formulário:", (error as Error).message);
-    if (error instanceof Error) {
-      throw error;
+      const errorData = await response.json().catch(() => ({}));
+      throw { status: response.status, errorData };
     }
 
-    throw new Error("Falha ao alterar a senha");
+    // Tenta ler o JSON, mas não quebra se não for JSON
+  } catch (error: any) {
+    const status = error?.status;
+    const errorData = error?.errorData ?? {};
+
+    // switch (status) {
+    //   case HttpStatusCode.Unauthorized:
+    //     throw new Error("Não autenticado. Verifique o 'Origin' e os cookies.");
+
+    //   case 419:
+    //     throw new Error("Erro de sessão. O token CSRF não correspondeu.");
+
+    //   case HttpStatusCode.UnprocessableEntity:
+    //     throw new Error(errorData.errors || "Erro de validação");
+
+    //   default:
+    //     // Se for erro de rede, DNS, CORS, etc.
+    //     if (!status) {
+    //       console.error("Erro inesperado de rede:", error);
+    //       throw new Error("Falha ao enviar a requisição");
+    //     }
+
+    throw new Error("Erro ao alterar a senha: " + status);
+    // }
   }
 }

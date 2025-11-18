@@ -104,7 +104,15 @@ export function usePerfilForm() {
         ((novaSenha || confirmarSenha) && !passwordIsValid(passwordChecks));
       if (hasErrors) return;
 
-      await requiresPasswordChangeService(novaSenha, confirmarSenha);
+      const result = await requiresPasswordChangeService(
+        novaSenha,
+        confirmarSenha
+      );
+
+      if (result) {
+        sessionStorage.setItem("requires_password_change", "false");
+      }
+
       return;
     } catch (error) {
       console.error("Erro ao atualizar a senha:", error);

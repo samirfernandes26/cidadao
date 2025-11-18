@@ -24,7 +24,7 @@ export default function Page() {
 
   return (
     <>
-      <TopBar titulo="Detalhes da marcação" />
+      <TopBar titulo="Detalhes da marcação" marcacao={true} perfil={true} />
       <div className="min-h-[60vh] bg-slate-50">
         <MarcacaoDetalhe marcacao={marcacao} />
       </div>
