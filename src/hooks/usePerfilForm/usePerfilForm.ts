@@ -1,7 +1,8 @@
 "use client";
 import { useMemo, useState } from "react";
 import { checkPassword, emailRegex, passwordIsValid } from "@/utils/validators";
-import updatePerfilService from "@/services/Perfil/update_perfil_service";
+import { updateProfileService } from "@/services/Perfil/update_perfil_service";
+
 import requiresPasswordChangeService from "@/services/Auth/requires_password_change_service";
 
 export function usePerfilForm() {
@@ -60,7 +61,7 @@ export function usePerfilForm() {
         ((novaSenha || confirmarSenha) && !passwordIsValid(passwordChecks));
       if (hasErrors) return;
 
-      const result = await updatePerfilService({
+      const result = await updateProfileService({
         senhaAtual,
         novaSenha,
         confirmarSenha,

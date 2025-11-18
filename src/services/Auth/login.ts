@@ -1,8 +1,8 @@
 "use server";
 
 import { cookies } from "next/headers";
-import { HttpStatusCode } from "axios"; 
-import { User } from "@/interfaces/auth"; 
+import { HttpStatusCode } from "axios";
+import { User } from "@/interfaces/auth";
 
 interface LoginResponse {
   message: string;
@@ -18,101 +18,96 @@ export interface IResponse {
 }
 
 async function login(login: string, password: string): Promise<IResponse> {
-  console.log("--- SERVIÇO DE LOGIN (fetch) INICIADO ---");
-
   const base = "http://desenvolvimento.versasaude.local/api";
 
   try {
-    console.log("Login: Chamando API em", `${base}/cidadao/login`);
-
     const response = await fetch(`${base}/cidadao/login`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
+        "Content-Type": "application/json",
+        Accept: "application/json",
       },
       body: JSON.stringify({
         login,
         password,
       }),
-      cache: 'no-store', 
+      cache: "no-store",
     });
-    
+
     const data = await response.json();
 
     if (!response.ok) {
-        console.error("Login: API retornou erro", response.status, data);
-        if (response.status === HttpStatusCode.UnprocessableEntity) {
-            return {
-                type: "error",
-                message: data.error || "Credenciais inválidas. Tente novamente.",
-            };
-        }
-        throw new Error(data.error || data.message || "Erro na resposta da API");
+      if (response.status === HttpStatusCode.UnprocessableEntity) {
+        return {
+          type: "error",
+          message: data.error || "Credenciais inválidas. Tente novamente.",
+        };
+      }
+      throw new Error(data.error || data.message || "Erro na resposta da API");
     }
-    
+
     const successData = data as LoginResponse;
-    console.log("Login: API respondeu com sucesso.");
-    
+
     const setCookieHeaders = response.headers.getSetCookie();
-    
+
     if (setCookieHeaders.length > 0) {
       const cookieStore = await cookies();
-      
-      console.log("Login: Repassando cookies do backend para o browser...");
 
-      setCookieHeaders.forEach((cookieString) => {
-        const parts = cookieString.split(';').map(part => part.trim());
-        const [nameValue] = parts[0].split('=');
-        const name = nameValue.trim();
-        const value = parts[0].substring(name.length + 1).trim();
+      for (const cookieString of setCookieHeaders) {
+        const parts = cookieString.split(";").map((p) => p.trim());
 
-        const options: any = {};
-        
-        parts.slice(1).forEach(part => {
-          const [key, ...val] = part.split('=');
-          const lowerKey = key.trim().toLowerCase();
-          const valStr = val.join('=');
+        const [name, value] = parts[0].split("=");
 
-          if (lowerKey === 'expires') options.expires = new Date(valStr);
-          if (lowerKey === 'max-age') options.maxAge = parseInt(valStr, 10);
-          
-          if (lowerKey === 'samesite') {
-             const s = valStr.toLowerCase();
+        const options: any = { path: "/" };
 
-             if (s === 'lax' || s === 'strict' || s === 'none') {
-               options.sameSite = s;
-             }
+        for (const part of parts.slice(1)) {
+          const [rawKey, ...rawVal] = part.split("=");
+          const key = rawKey.toLowerCase().trim();
+          const val = rawVal.join("=").trim();
+
+          switch (key) {
+            case "expires":
+              options.expires = new Date(val);
+              break;
+
+            case "max-age":
+              options.maxAge = parseInt(val, 10);
+              break;
+
+            case "samesite":
+              const s = val.toLowerCase();
+              if (["lax", "strict", "none"].includes(s)) {
+                options.sameSite = s;
+              }
+              break;
+
+            case "secure":
+              options.secure = true;
+              break;
+
+            case "httponly":
+              options.httpOnly = true;
+              break;
           }
+        }
 
-          if (lowerKey === 'secure') options.secure = true;
-          if (lowerKey === 'httponly') options.httpOnly = true;
-        });
-
-        options.path = '/';
-
-        console.log(`Login: Definindo cookie [${name}] no browser (Domain: localhost, Path: /)`);
-        cookieStore.set(name, value, options);
-      });
-      
-    } else {
-      console.warn("Login: O backend não retornou headers 'Set-Cookie'.");
+        cookieStore.set(name.trim(), value.trim(), options);
+      }
     }
-    
-    console.log("--- SERVIÇO DE LOGIN (fetch) CONCLUÍDO ---");
 
     return {
       type: "success",
       message: successData.message,
       user: successData.user,
-      requiresPasswordChange: successData.requires_password_change, 
+      requiresPasswordChange: successData.requires_password_change,
     };
-
   } catch (err) {
-    console.error("Login (Erro Catastrófico):", err);
     return {
       type: "error",
-      message: (err instanceof Error) ? err.message : "Ocorreu um erro. Por favor, tente novamente mais tarde.",
+      message:
+        err instanceof Error
+          ? err.message
+          : "Ocorreu um erro. Por favor, tente novamente mais tarde.",
     };
   }
 }

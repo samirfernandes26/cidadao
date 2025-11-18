@@ -28,11 +28,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     useState<boolean>(false);
 
   async function login(login: string, password: string) {
-    const result: IResponse = await doLogin(
-      login,
-      password
-    );
-
+    const result: IResponse = await doLogin(login, password);
     if (result.type === "success") {
       sessionStorage.setItem("user_info", JSON.stringify(result.user));
       sessionStorage.setItem(
@@ -43,23 +39,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setRequiresPasswordChange(!!result.requiresPasswordChange);
       setUser(result.user!);
       setStatus("authenticated");
-    } else {
-      throw new Error(result.message);
     }
   }
 
   const logout = async () => {
     try {
-      await testLogout(); 
+      await testLogout();
     } catch (error) {
-      console.error("Falha ao deslogar da API, limpando sessão local mesmo assim.", error);
+      console.error(
+        "Falha ao deslogar da API, limpando sessão local mesmo assim.",
+        error
+      );
     } finally {
       sessionStorage.removeItem("user_info");
       sessionStorage.removeItem("requires_password_change");
       setUser({} as User);
       setRequiresPasswordChange(false);
-      
-      setStatus("unauthenticated"); 
+
+      setStatus("unauthenticated");
     }
   };
 
@@ -75,21 +72,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const rotaAtualEhPublica = rotasPublicas.includes(pathname);
 
     if (status === "authenticated") {
-
       if (requiresPasswordChange) {
         router.push("/auth/atualizar-senha");
       } else if (rotaAtualEhPublica) {
-        router.push("/test-api"); 
+        router.push("/test-api");
       }
-      
     } else {
-      
       if (!rotaAtualEhPublica && pathname !== "/auth/atualizar-senha") {
         router.push("/auth/login");
       }
     }
-
-  }, [status, requiresPasswordChange, router, pathname]); 
+  }, [status, requiresPasswordChange, router, pathname]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

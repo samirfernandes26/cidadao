@@ -47,105 +47,13 @@ export default function AtualizarSenhaPage() {
     setConfirmarSenha,
     ErrorNovaSenha,
     ErrorConfirmaSenha,
+    loading,
     submitUpdatePassword,
   } = usePerfilForm();
 
-  const [loading, setLoading] = useState(false);
-  const [okMsg, setOkMsg] = useState<string | null>(null);
-  const [errMsg, setErrMsg] = useState<string | null>(null);
-  const [senha, setSenha] = useState("");
-  const [confirmaSenha, setConfirmaSenha] = useState("");
-
-  const { requiresPasswordChange } = useAuth();
-  const router = useRouter();
-
-  // useEffect(() => {
-  //   if (requiresPasswordChange === false) {
-  //     router.push("/test-api"); 
-  //   }
-  // }, [requiresPasswordChange, router]);
-
-  // Requisitos de senha
-  const requisitos = [
-    {
-      label: "Mínimo de 8 caracteres",
-      test: (s: string) => s.length >= 8,
-    },
-    {
-      label: "Pelo menos 1 símbolo especial",
-      test: (s: string) => /[^A-Za-z0-9]/.test(s),
-    },
-    {
-      label: "Pelo menos 1 número",
-      test: (s: string) => /[0-9]/.test(s),
-    },
-    {
-      label: "Pelo menos 1 letra maiúscula",
-      test: (s: string) => /[A-Z]/.test(s),
-    },
-    {
-      label: "Pelo menos 1 letra minúscula",
-      test: (s: string) => /[a-z]/.test(s),
-    },
-  ];
-
-  const requisitosVisuais = [
-    ...requisitos.map((req) => ({
-      label: req.label,
-      ok: req.test(senha),
-    })),
-    {
-      label: "Senhas conferem",
-      ok: senha.length > 0 && senha === confirmaSenha,
-    },
-  ];
-
-  function validate(newPass: string, conf: string) {
-    for (const req of requisitos) {
-      if (!req.test(newPass)) return `A senha não atende: ${req.label}`;
-    }
-    if (newPass !== conf) return "A confirmação deve ser igual à nova senha.";
-    return null;
-  }
-
-  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setErrMsg(null);
-    setOkMsg(null);
-
-    const fd = new FormData(e.currentTarget);
-    const new_password = String(fd.get("new_password") || "");
-    const confirm_password = String(fd.get("confirm_password") || "");
-
-    const v = validate(new_password, confirm_password);
-    if (v) {
-      setErrMsg(v);
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const result = await requiresPasswordChangeService(
-        new_password,
-        confirm_password
-      );
-      if (result === true) {
-        if (typeof window !== "undefined") {
-          sessionStorage.setItem("requires_password_change", "false");
-        }
-        // router.push("/marcacoes");
-        return;
-      }
-      setOkMsg("Senha atualizada com sucesso!");
-      (e.target as HTMLFormElement).reset();
-    } catch (error: unknown) {
-      setErrMsg(
-        (error as Error)?.message ||
-          "Não foi possível atualizar a senha. Tente novamente."
-      );
-    } finally {
-      setLoading(false);
-    }
+    await submitUpdatePassword();
   }
 
   return (
@@ -197,16 +105,6 @@ export default function AtualizarSenhaPage() {
             {loading ? "Salvando..." : "Salvar nova senha"}
           </button>
         </form>
-
-        <button 
-          type="button" 
-          className={styles.submit}
-          style={{ marginTop: '10px', backgroundColor: '#6c757d', opacity: 0.8 }}
-          onClick={() => router.back()}
-        >
-          Voltar
-        </button>
-        
       </div>
     </main>
   );

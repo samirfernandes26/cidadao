@@ -5,18 +5,18 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import styles from "./login.module.css";
 
-import { useAuth } from "@/hooks/auth"; 
+import { useAuth } from "@/hooks/auth";
 interface IResponse {
   type: "success" | "error";
   message: string;
-  user?: any; 
+  user?: any;
   requiresPasswordChange?: boolean;
 }
 
 export default function LoginIndex() {
   const router = useRouter();
   const params = useSearchParams();
-  const { login, user } = useAuth(); 
+  const { login, user } = useAuth();
 
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -50,8 +50,7 @@ export default function LoginIndex() {
   return (
     <main className={styles.page}>
       <div className={styles.card}>
-        {
-        /* <div className={styles.iconWrap} aria-hidden>
+        {/* <div className={styles.iconWrap} aria-hidden>
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
             <path
               d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm7 8a7 7 0 0 0-14 0"
@@ -61,8 +60,7 @@ export default function LoginIndex() {
               strokeLinejoin="round"
             />
           </svg>
-        </div> */
-        }
+        </div> */}
 
         <h1 className={styles.title}>Portal do Cidadão</h1>
         <p className={styles.subtitle}>Acesse sua conta para continuar.</p>
