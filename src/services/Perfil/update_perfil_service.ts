@@ -1,51 +1,80 @@
 "use server";
 
 import { cookies } from "next/headers";
-import axios from "axios";
+import { HttpStatusCode } from "axios";
 
-interface UpdatePerfilParams {
+const API_BASE_URL = "http://desenvolvimento.versasaude.local";
+const UPDATE_PROFILE_ROUTE = `${API_BASE_URL}/api/cidadao/atualizar-perfil`;
+
+export interface IProfileUpdatePayload {
   senhaAtual: string;
   novaSenha?: string;
   confirmarSenha?: string;
   email?: string;
 }
 
-export default async function updatePerfilService(
-  data: UpdatePerfilParams
-): Promise<boolean | null> {
-  // if (!token) throw new Error("Você não está autenticado");
+export interface IProfileUpdateResponse {
+  status: "success" | "error";
+  message: string;
+  user?: any;
+  errors?: Record<string, string[]>;
+}
+
+export async function updateProfileService(
+  payload: IProfileUpdatePayload
+): Promise<IProfileUpdateResponse> {
+  const cookieStore = await cookies();
+  const sessionCookie = cookieStore.get("versasaude_session");
+  const xsrfCookie = cookieStore.get("XSRF-TOKEN");
+
+  if (!sessionCookie || !xsrfCookie) {
+    throw new Error("Você não está autenticado ou sua sessão expirou.");
+  }
 
   try {
-    const base = "https://teste1.versasaude.com.br/api";
+    const finalCookieHeader = `versasaude_session=${sessionCookie.value}; XSRF-TOKEN=${xsrfCookie.value}`;
 
-    const response = await axios.post(
-      `${base}/cidadao/atualizar-perfil`,
-      {
-        senha_atual: data.senhaAtual,
-        nova_senha: data.novaSenha,
-        email: data.email,
-        confirmar_senha: data.confirmarSenha,
+    const response = await fetch(UPDATE_PROFILE_ROUTE, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        Cookie: finalCookieHeader,
+        "X-XSRF-TOKEN": xsrfCookie.value,
+        Origin: API_BASE_URL,
       },
-      {
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        withCredentials: false,
+      body: JSON.stringify({
+        senha_atual: payload.senhaAtual,
+        nova_senha: payload.novaSenha,
+        email: payload.email,
+        confirmar_senha: payload.confirmarSenha,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      if (response.status === HttpStatusCode.UnprocessableEntity) {
+        const errorMessages = Object.values(data.errors || {})
+          .flat()
+          .join(" ");
+        throw new Error(
+          errorMessages || data.message || "Erro de validação (422)"
+        );
       }
-    );
 
-    if (!response.data || !Array.isArray(response.data.data)) {
-      return false;
+      if (response.status === 419) {
+        throw new Error("Erro de sessão (419). O token CSRF não correspondeu.");
+      }
+
+      throw new Error(data.message || "Erro desconhecido na API");
     }
-    return true;
-  } catch (error: unknown) {
-    console.error(
-      "Erro em updatePerfilService:",
-      error,
-      (error as Error).message
-    );
 
-    throw new Error((error as Error).message || "Falha ao atualizar perfil");
+    return data as IProfileUpdateResponse;
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error("Falha ao alterar o perfil");
   }
 }

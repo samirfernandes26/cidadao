@@ -1,19 +1,16 @@
 "use server";
 
 import { cookies } from "next/headers";
-import axios, { HttpStatusCode } from "axios";
-
+import { HttpStatusCode } from "axios";
 import { User } from "@/interfaces/auth";
 
 interface LoginResponse {
-  token: string;
   message: string;
   requires_password_change: boolean;
-  expires_at: string; // ISO 8601
   user: User;
 }
 
-interface IResponse {
+export interface IResponse {
   type: "success" | "error";
   message: string;
   user?: User;
@@ -21,55 +18,96 @@ interface IResponse {
 }
 
 async function login(login: string, password: string): Promise<IResponse> {
-  const base = "https://teste1.versasaude.com.br/api";
+  const base = "http://desenvolvimento.versasaude.local/api";
 
   try {
-    const { data, headers } = await axios.post<LoginResponse>(
-      `${base}/cidadao/login`,
-      {
+    const response = await fetch(`${base}/cidadao/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
         login,
         password,
-      }
-    );
-
-    const cookieStore = await cookies();
-
-    headers["set-cookie"]?.forEach((cookieString) => {
-      const parts = cookieString.split(";");
-      const [name, value] = parts[0].split("=");
-
-      console.log(name, value);
-      cookieStore.set(name, value);
+      }),
+      cache: "no-store",
     });
 
-    cookieStore.set("auth_token", data.token, {
-      path: "/",
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      expires: new Date(data.expires_at),
-    });
+    const data = await response.json();
 
-    return {
-      type: "success",
-      message: data.message,
-      user: data.user,
-      requiresPasswordChange: data.requires_password_change,
-    };
-  } catch (err) {
-    if (axios.isAxiosError(err)) {
-      if (err.status == HttpStatusCode.UnprocessableEntity) {
-        alert("Credenciais inválidas. Tente novamente.");
+    if (!response.ok) {
+      if (response.status === HttpStatusCode.UnprocessableEntity) {
+        return {
+          type: "error",
+          message: data.error || "Credenciais inválidas. Tente novamente.",
+        };
       }
+      throw new Error(data.error || data.message || "Erro na resposta da API");
+    }
 
-      return {
-        type: "error",
-        message: "Usuário e/ou senha inválidos.",
-      };
+    const successData = data as LoginResponse;
+
+    const setCookieHeaders = response.headers.getSetCookie();
+
+    if (setCookieHeaders.length > 0) {
+      const cookieStore = await cookies();
+
+      for (const cookieString of setCookieHeaders) {
+        const parts = cookieString.split(";").map((p) => p.trim());
+
+        const [name, value] = parts[0].split("=");
+
+        const options: any = { path: "/" };
+
+        for (const part of parts.slice(1)) {
+          const [rawKey, ...rawVal] = part.split("=");
+          const key = rawKey.toLowerCase().trim();
+          const val = rawVal.join("=").trim();
+
+          switch (key) {
+            case "expires":
+              options.expires = new Date(val);
+              break;
+
+            case "max-age":
+              options.maxAge = parseInt(val, 10);
+              break;
+
+            case "samesite":
+              const s = val.toLowerCase();
+              if (["lax", "strict", "none"].includes(s)) {
+                options.sameSite = s;
+              }
+              break;
+
+            case "secure":
+              options.secure = true;
+              break;
+
+            case "httponly":
+              options.httpOnly = true;
+              break;
+          }
+        }
+
+        cookieStore.set(name.trim(), value.trim(), options);
+      }
     }
 
     return {
+      type: "success",
+      message: successData.message,
+      user: successData.user,
+      requiresPasswordChange: successData.requires_password_change,
+    };
+  } catch (err) {
+    return {
       type: "error",
-      message: "Ocorreu um erro. Por favor, tente novamente mais tarde.",
+      message:
+        err instanceof Error
+          ? err.message
+          : "Ocorreu um erro. Por favor, tente novamente mais tarde.",
     };
   }
 }

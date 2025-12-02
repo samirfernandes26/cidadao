@@ -91,7 +91,7 @@ export default function Dashboard() {
 
   return (
     <>
-      <TopBar titulo="Marcações" />
+      <TopBar titulo="Marcações" marcacao={false} perfil={true} />
       <main className="p-4 sm:p-6">
         {loading && <p>Carregando marcações...</p>}
         {error && <p style={{ color: "red" }}>{error}</p>}

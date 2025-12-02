@@ -8,9 +8,11 @@ import styles from "./style.module.css";
 
 interface TopBarProps {
   titulo: string;
+  marcacao: boolean;
+  perfil: boolean;
 }
 
-export const TopBar = ({ titulo }: TopBarProps) => {
+export const TopBar = ({ titulo, marcacao, perfil }: TopBarProps) => {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
@@ -96,22 +98,26 @@ export const TopBar = ({ titulo }: TopBarProps) => {
         aria-hidden={!open}
         className={`${styles.mobileMenu} ${open ? styles.mobileMenuOpen : ""}`}
       >
-        <Link
-          href="/perfil"
-          role="menuitem"
-          className={styles.mobileItem}
-          onClick={() => setOpen(false)}
-        >
-          Perfil
-        </Link>
-        <Link
-          href="/marcacoes"
-          role="menuitem"
-          className={styles.mobileItem}
-          onClick={() => setOpen(false)}
-        >
-          Marcações
-        </Link>
+        {perfil == true && (
+          <Link
+            href="/perfil"
+            role="menuitem"
+            className={styles.mobileItem}
+            onClick={() => setOpen(false)}
+          >
+            Perfil
+          </Link>
+        )}
+        {marcacao == true && (
+          <Link
+            href="/marcacoes"
+            role="menuitem"
+            className={styles.mobileItem}
+            onClick={() => setOpen(false)}
+          >
+            Marcações
+          </Link>
+        )}
         <button
           role="menuitem"
           className={`${styles.mobileItem} ${styles.mobileDanger}`}
