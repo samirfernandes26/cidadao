@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import axios, { HttpStatusCode } from "axios";
 
 import { User } from "@/interfaces/auth";
+import { Api_csrf_token, Api_login } from "@/utils/const/const";
 
 interface LoginResponse {
   token: string;
@@ -13,7 +14,7 @@ interface LoginResponse {
   user: User;
 }
 
-interface IResponse {
+export interface IResponse {
   type: "success" | "error";
   message: string;
   user?: User;
@@ -21,39 +22,33 @@ interface IResponse {
 }
 
 async function login(login: string, password: string): Promise<IResponse> {
-  const base = "https://teste1.versasaude.com.br/api";
-
   try {
-    const { data, headers } = await axios.post<LoginResponse>(
-      `${base}/cidadao/login`,
-      {
-        login,
-        password,
-      }
-    );
+    const { data, headers } = await axios.post<LoginResponse>(Api_login, {
+      login,
+      password,
+    });
+
+    const successData = data as LoginResponse;
+
+    const setCookieHeaders = headers["set-cookie"] || [];
 
     const cookieStore = await cookies();
 
-    headers["set-cookie"]?.forEach((cookieString) => {
-      const parts = cookieString.split(";");
-      const [name, value] = parts[0].split("=");
+    cookieStore.set("teste_persistencia", "true");
 
-      console.log(name, value);
-      cookieStore.set(name, value);
-    });
-
-    cookieStore.set("auth_token", data.token, {
-      path: "/",
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      expires: new Date(data.expires_at),
-    });
+    if (setCookieHeaders.length > 0) {
+      for (const cookieString of setCookieHeaders) {
+        const [cookieValue] = cookieString.split(";");
+        const [name, value] = cookieValue.split("=");
+        cookieStore.set(name, value);
+      }
+    }
 
     return {
       type: "success",
-      message: data.message,
-      user: data.user,
-      requiresPasswordChange: data.requires_password_change,
+      message: successData.message,
+      user: successData.user,
+      requiresPasswordChange: successData.requires_password_change,
     };
   } catch (err) {
     if (axios.isAxiosError(err)) {

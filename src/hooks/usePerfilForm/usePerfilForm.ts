@@ -1,8 +1,9 @@
 "use client";
 import { useMemo, useState } from "react";
 import { checkPassword, emailRegex, passwordIsValid } from "@/utils/validators";
-import updatePerfilService from "@/services/Perfil/update_perfil_service";
+
 import requiresPasswordChangeService from "@/services/Auth/requires_password_change_service";
+import { updateProfileService } from "@/services/Perfil/update_perfil_service";
 
 export function usePerfilForm() {
   const [email, setEmail] = useState("");
@@ -19,7 +20,7 @@ export function usePerfilForm() {
 
   const passwordChecks = useMemo(
     () => checkPassword(novaSenha, confirmarSenha),
-    [novaSenha, confirmarSenha]
+    [novaSenha, confirmarSenha],
   );
 
   async function submit() {
@@ -43,7 +44,7 @@ export function usePerfilForm() {
       if (novaSenha || confirmarSenha) {
         if (!passwordIsValid(passwordChecks)) {
           setErrorNovaSenha(
-            "A atualização de senha não cumpre todos os requisitos necessários."
+            "A atualização de senha não cumpre todos os requisitos necessários.",
           );
         }
       }
@@ -51,7 +52,7 @@ export function usePerfilForm() {
       // se há qualquer erro, não envia
       const hasErrors =
         [ErrorEmail, ErrorSenhaAtual, ErrorNovaSenha, ErrorConfirmaSenha].some(
-          Boolean
+          Boolean,
         ) ||
         !senhaAtual ||
         (email && !emailRegex.test(email)) ||
@@ -60,7 +61,7 @@ export function usePerfilForm() {
         ((novaSenha || confirmarSenha) && !passwordIsValid(passwordChecks));
       if (hasErrors) return;
 
-      const result = await updatePerfilService({
+      const result = await updateProfileService({
         senhaAtual,
         novaSenha,
         confirmarSenha,
@@ -91,7 +92,7 @@ export function usePerfilForm() {
       if (novaSenha || confirmarSenha) {
         if (!passwordIsValid(passwordChecks)) {
           setErrorNovaSenha(
-            "A atualização de senha não cumpre todos os requisitos necessários."
+            "A atualização de senha não cumpre todos os requisitos necessários.",
           );
         }
       }

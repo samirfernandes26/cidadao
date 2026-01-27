@@ -3,15 +3,10 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
-// import {
-//   readUserFromSession,
-//   saveUserToSession,
-//   clearUserFromSession,
-// } from "@/utils/browserSession";
-
-import { login as doLogin } from "@/services/Auth/login";
+import { login as doLogin, IResponse } from "@/services/Auth/login";
 
 import type { User } from "@/interfaces/auth";
+import { logoutService } from "@/services/Auth/logout_service";
 
 type Status = "loading" | "authenticated" | "unauthenticated";
 
@@ -33,37 +28,48 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     useState<boolean>(false);
 
   async function login(login: string, password: string) {
-    const { type, user, requiresPasswordChange } = await doLogin(
-      login,
-      password
-    );
+    const result: IResponse = await doLogin(login, password);
 
-    if (type === "success") {
-      sessionStorage.setItem("user_info", JSON.stringify(user));
+    if (result.type === "success") {
+      sessionStorage.setItem("user_info", JSON.stringify(result.user));
       sessionStorage.setItem(
         "requires_password_change",
-        requiresPasswordChange ? "true" : "false"
+        result.requiresPasswordChange ? "true" : "false",
       );
 
-      setRequiresPasswordChange(!!requiresPasswordChange);
-      setUser(user!);
+      setRequiresPasswordChange(!!result.requiresPasswordChange);
+      setUser(result.user!);
       setStatus("authenticated");
     }
   }
 
   const logout = async () => {
-    // TODO: chamar serviço de logout
+    try {
+      await logoutService();
+    } catch (error) {
+      console.error(
+        "Falha ao deslogar da API, limpando sessão local mesmo assim.",
+        error,
+      );
+    } finally {
+      sessionStorage.removeItem("user_info");
+      sessionStorage.removeItem("requires_password_change");
+      setUser({} as User);
+      setRequiresPasswordChange(false);
+
+      setStatus("unauthenticated");
+    }
   };
 
   const value = useMemo(
     () => ({ status, user, login, logout, requiresPasswordChange }),
-    [status, user, requiresPasswordChange]
+    [status, user, requiresPasswordChange],
   );
 
   useEffect(() => {
     const userInfo = sessionStorage.getItem("user_info");
     const requiresPasswordChange = sessionStorage.getItem(
-      "requires_password_change"
+      "requires_password_change",
     );
 
     if (!!userInfo) {

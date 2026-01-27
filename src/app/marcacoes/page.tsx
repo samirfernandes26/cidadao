@@ -17,7 +17,7 @@ function salvarMarcacaoSession(marcacao: Marcacao) {
   try {
     sessionStorage.setItem(
       `marcacao-${marcacao.agendamento_id}`,
-      JSON.stringify(marcacao)
+      JSON.stringify(marcacao),
     );
   } catch (error: unknown) {
     console.error("Erro ao salvar marcação no sessionStorage:", error);

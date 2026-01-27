@@ -3,36 +3,51 @@
 import { cookies } from "next/headers";
 import axios from "axios";
 import { Marcacao } from "@/interfaces/marcacao";
+import { Api_marcacoes } from "@/utils/const/const";
+
+interface IResponse {
+  success: boolean;
+  message: string;
+  data: {
+    marcacoes: Marcacao[];
+    pagination: {
+      total: number;
+      per_page: number;
+      current_page: number;
+      last_page: number;
+    };
+  };
+}
 
 export default async function getMarcacoesService(): Promise<Marcacao[]> {
   const cookieStore = await cookies();
-  const token = cookieStore.get("auth_token");
-
-  if (!token) throw new Error("Você não está autenticado");
 
   try {
-    const base = "https://teste1.versasaude.com.br/api";
+    const allCookies = cookieStore.getAll();
+    const cookieHeader = allCookies
+      .map((c) => `${c.name}=${c.value}`)
+      .join("; ");
 
-    const response = await axios.get(`${base}/cidadao/marcacoes`, {
-      headers: {
-        "X-Requested-With": "XMLHttpRequest",
-        Authorization: `Bearer ${token.value}`,
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
+    const headers: Record<string, string> = {
+      Accept: "application/json",
+      Cookie: cookieHeader,
+    };
+
+    const { data } = await axios.get<IResponse>(Api_marcacoes, {
+      headers,
       withCredentials: true,
     });
 
-    if (!response.data || !Array.isArray(response.data.data)) {
-      return [];
-    }
+    const {
+      data: { marcacoes },
+    } = data;
 
-    return response.data.data as Marcacao[];
+    return marcacoes ?? [];
   } catch (error: unknown) {
     console.error(
       "Erro em getMarcacoesService:",
       error,
-      (error as Error).message
+      (error as Error).message,
     );
     throw new Error((error as Error).message || "Falha ao obter marcações");
   }
