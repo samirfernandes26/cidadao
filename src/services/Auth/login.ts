@@ -34,8 +34,6 @@ async function login(login: string, password: string): Promise<IResponse> {
 
     const cookieStore = await cookies();
 
-    cookieStore.set("teste_persistencia", "true");
-
     if (setCookieHeaders.length > 0) {
       for (const cookieString of setCookieHeaders) {
         const [cookieValue] = cookieString.split(";");

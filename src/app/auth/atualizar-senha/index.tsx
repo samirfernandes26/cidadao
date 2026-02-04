@@ -1,12 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import requiresPasswordChangeService from "@/services/Auth/requires_password_change_service";
-import { useRouter } from "next/navigation";
-
 import styles from "./atualizar_senha.module.css";
-import { useAuth } from "@/hooks/auth";
-import RequirementsList from "@/components/Form/RequirementsList/RequirementsList";
 import PasswordField from "@/components/Form/PasswordField/passwordField";
 import { usePerfilForm } from "@/hooks/usePerfilForm/usePerfilForm";
 

@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import axios from "axios";
 import { Marcacao } from "@/interfaces/marcacao";
 import { Api_marcacoes } from "@/utils/const/const";
+import getApiCsrfTokemService from "../Auth/get_csrf_tokem_service";
 
 interface IResponse {
   success: boolean;

@@ -57,6 +57,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser({} as User);
       setRequiresPasswordChange(false);
 
+      (await cookieStore.getAll()).forEach((cookie) => {
+        if (cookie.name) {
+          cookieStore.delete(cookie.name);
+        }
+      });
+
       setStatus("unauthenticated");
     }
   };

@@ -1,42 +1,53 @@
 "use server";
 
 import { cookies } from "next/headers";
-import axios, { HttpStatusCode } from "axios";
+import axios from "axios";
 import { Api_renovar_senha } from "@/utils/const/const";
+import getApiCsrfTokemService from "./get_csrf_tokem_service";
+import { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
+
+interface IResponse {
+  status: string;
+  message: string;
+}
 
 async function requiresPasswordChangeService(
   novaSenha: string,
   confirmarSenha: string,
-) {
+): Promise<void | boolean> {
   const cookieStore = await cookies();
-  const token = cookieStore.get("auth_token"); // ajuste para "token" se necessário
-
-  if (!token) throw new Error("Você não está autenticado");
 
   try {
-    const response = await axios.post(
+    const csrfToken: string = String(await getApiCsrfTokemService()) ?? "";
+
+    const allCookies: RequestCookie[] = cookieStore.getAll();
+    const cookieHeader: string = allCookies
+      .map((c) => `${c.name}=${c.value}`)
+      .join("; ");
+
+    const headers: Record<string, string> = {
+      Accept: "application/json",
+      Cookie: cookieHeader,
+      "X-CSRF-TOKEN": csrfToken,
+    };
+
+    const { data } = await axios.post<IResponse>(
       Api_renovar_senha,
       {
         nova_senha: novaSenha,
         confirmar_senha: confirmarSenha,
       },
       {
-        headers: {
-          "X-Requested-With": "XMLHttpRequest",
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
+        headers,
         withCredentials: true,
       },
     );
 
-    if (response.status === HttpStatusCode.Ok) {
+    if (data.status === "success") {
+      sessionStorage.setItem("requires_password_change", "true");
       return true;
     } else {
-      throw new Error(
-        "Erro ao alterar a senha: " +
-          (response.data?.message || response.statusText),
-      );
+      throw new Error("Erro ao alterar a senha: " + data.message);
     }
   } catch (error: unknown) {
     console.error(

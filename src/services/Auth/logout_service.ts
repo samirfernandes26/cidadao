@@ -1,41 +1,42 @@
 "use server";
 
 import { cookies } from "next/headers";
-import { HttpStatusCode } from "axios";
-import { Api_logout } from "@/utils/const/const";
+import axios from "axios";
+import { Api_logout, Api_marcacoes } from "@/utils/const/const";
+import getApiCsrfTokemService from "./get_csrf_tokem_service";
+import { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
+
+interface IResponse {
+  message: string;
+}
 
 export async function logoutService(): Promise<void | { message: string }> {
   const cookieStore = await cookies();
-  const sessionCookie = cookieStore.get("versasaude_session");
-  const xsrfCookie = cookieStore.get("XSRF-TOKEN");
 
   try {
-    if (!sessionCookie || !xsrfCookie) {
-      throw new Error("Você não está autenticado ou sua sessão expirou.");
-    }
+    const csrfToken: string = String(await getApiCsrfTokemService()) ?? "";
 
-    const finalCookieHeader = `versasaude_session=${sessionCookie.value}; XSRF-TOKEN=${xsrfCookie.value}`;
+    const allCookies: RequestCookie[] = cookieStore.getAll();
+    const cookieHeader: string = allCookies
+      .map((c) => `${c.name}=${c.value}`)
+      .join("; ");
 
-    const response = await fetch(Api_logout, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        Cookie: finalCookieHeader,
-        "X-XSRF-TOKEN": xsrfCookie.value,
+    const headers: Record<string, string> = {
+      Accept: "application/json",
+      Cookie: cookieHeader,
+      "X-CSRF-TOKEN": csrfToken,
+    };
+
+    const { data } = await axios.post<IResponse>(
+      Api_logout,
+      {},
+      {
+        headers,
+        withCredentials: true,
       },
-    });
+    );
 
-    if (
-      response.status === HttpStatusCode.Ok ||
-      response.status === HttpStatusCode.NoContent ||
-      response.status === 204
-    ) {
-      const data = await response
-        .json()
-        .catch(() => ({ message: "Logout realizado com sucesso." }));
-
-      return data;
-    }
+    return data;
   } catch (error: unknown) {
     console.error("Erro no serviço de logout:", (error as Error).message);
 
@@ -44,9 +45,5 @@ export async function logoutService(): Promise<void | { message: string }> {
     }
 
     throw new Error("Falha ao fazer logout");
-  } finally {
-    cookieStore.getAll().forEach((cookie) => {
-      cookieStore.delete(cookie.name);
-    });
   }
 }
