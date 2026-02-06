@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import styles from "./login.module.css";
 
@@ -76,6 +75,7 @@ export default function LoginIndex() {
               className={styles.input}
             />
           </label>
+
           <label className={styles.label}>
             <span className={styles.labelText}>Senha</span>
             <input
@@ -94,15 +94,9 @@ export default function LoginIndex() {
               {showPass ? "Ocultar senha" : "Mostrar senha"}
             </button>
           </label>
+
           {err && <p className={styles.error}>{err}</p>}
-          //{" "}
-          <div className={styles.forgotRow}>
-            //{" "}
-            <Link href="#" className={styles.forgot}>
-              // Esqueceu sua senha? //{" "}
-            </Link>
-            //{" "}
-          </div>
+
           <button type="submit" className={styles.submit} disabled={loading}>
             {loading ? "Entrando..." : "Login"}
           </button>

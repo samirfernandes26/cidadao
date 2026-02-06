@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { logoutService } from "@/services/Auth/logout_service";
 import styles from "./style.module.css";
 
@@ -12,6 +12,9 @@ interface TopBarProps {
 
 export const TopBar = ({ titulo }: TopBarProps) => {
   const router = useRouter();
+  const pathname = usePathname();
+  const hideMarcacoesLink = pathname?.startsWith("/marcacoes");
+  const hidePerfilLink = pathname?.startsWith("/perfil");
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const btnRef = useRef<HTMLButtonElement | null>(null);
@@ -63,12 +66,16 @@ export const TopBar = ({ titulo }: TopBarProps) => {
 
       {/* Navegação (desktop) */}
       <nav className={styles.nav} aria-label="Principal">
-        <Link href="/perfil" className={styles.navLink}>
-          Perfil
-        </Link>
-        <Link href="/marcacoes" className={styles.navLink}>
-          Marcações
-        </Link>
+        {!hidePerfilLink && (
+          <Link href="/perfil" className={styles.navLink}>
+            Perfil
+          </Link>
+        )}
+        {!hideMarcacoesLink && (
+          <Link href="/marcacoes" className={styles.navLink}>
+            Marcações
+          </Link>
+        )}
         <button onClick={handleLogout} className={styles.navButton}>
           Sair da conta
         </button>
@@ -96,22 +103,26 @@ export const TopBar = ({ titulo }: TopBarProps) => {
         aria-hidden={!open}
         className={`${styles.mobileMenu} ${open ? styles.mobileMenuOpen : ""}`}
       >
-        <Link
-          href="/perfil"
-          role="menuitem"
-          className={styles.mobileItem}
-          onClick={() => setOpen(false)}
-        >
-          Perfil
-        </Link>
-        <Link
-          href="/marcacoes"
-          role="menuitem"
-          className={styles.mobileItem}
-          onClick={() => setOpen(false)}
-        >
-          Marcações
-        </Link>
+        {!hidePerfilLink && (
+          <Link
+            href="/perfil"
+            role="menuitem"
+            className={styles.mobileItem}
+            onClick={() => setOpen(false)}
+          >
+            Perfil
+          </Link>
+        )}
+        {!hideMarcacoesLink && (
+          <Link
+            href="/marcacoes"
+            role="menuitem"
+            className={styles.mobileItem}
+            onClick={() => setOpen(false)}
+          >
+            Marcações
+          </Link>
+        )}
         <button
           role="menuitem"
           className={`${styles.mobileItem} ${styles.mobileDanger}`}

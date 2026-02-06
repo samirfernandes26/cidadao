@@ -8,8 +8,6 @@ import type { Procedimento } from "@/interfaces";
 import getMarcacoesService from "@/services/Marcacao/marcacao_service";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import styles from "./marcacoes.module.css";
-import { logoutService } from "@/services/Auth/logout_service";
 import { TopBar } from "@/components/TopBar/TopBar";
 
 function salvarMarcacaoSession(marcacao: Marcacao) {
@@ -95,18 +93,27 @@ export default function Dashboard() {
       <main className="p-4 sm:p-6">
         {loading && <p>Carregando marcações...</p>}
         {error && <p style={{ color: "red" }}>{error}</p>}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-1 xl:grid-cols-2">
-          {marcacoes.map((m: Marcacao) => (
-            <ProcedimentoCard
-              key={m.agendamento_id}
-              data={toCardData(m)}
-              onDetalhesClick={() => {
-                salvarMarcacaoSession(m);
-                router.push(`/marcacoes/${m.agendamento_id}`);
-              }}
-            />
-          ))}
-        </div>
+        {!loading && !error && marcacoes.length === 0 && (
+          <div className="min-h-[40vh] flex items-center justify-center px-4">
+            <p className="text-center text-slate-600 text-sm sm:text-base">
+              Você não tem nenhuma marcação para você atualmente.
+            </p>
+          </div>
+        )}
+        {marcacoes.length > 0 && (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-1 xl:grid-cols-2">
+            {marcacoes.map((m: Marcacao) => (
+              <ProcedimentoCard
+                key={m.agendamento_id}
+                data={toCardData(m)}
+                onDetalhesClick={() => {
+                  salvarMarcacaoSession(m);
+                  router.push(`/marcacoes/${m.agendamento_id}`);
+                }}
+              />
+            ))}
+          </div>
+        )}
       </main>
     </>
   );

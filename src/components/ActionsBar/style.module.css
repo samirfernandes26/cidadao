@@ -31,3 +31,15 @@
 .primaryBtn:active {
   transform: translateY(1px);
 }
+.dangerBtn {
+  background: #dc2626;
+  box-shadow: 0 2px 8px #dc262622;
+}
+.dangerBtn:hover {
+  background: #b91c1c;
+}
+.primaryBtn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  box-shadow: none;
+}

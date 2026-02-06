@@ -24,10 +24,40 @@
 }
 
 .title {
-  margin: 0 0 18px;
+  margin: 0;
   font-weight: 700;
   color: var(--text);
   font-size: clamp(1.4rem, 2.2vw, 2rem);
+}
+
+.headerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.editToggleBtn {
+  border: 1px solid var(--border);
+  background: var(--white);
+  color: var(--text);
+  border-radius: 999px;
+  padding: 0.5rem 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+.editToggleBtn:hover {
+  background: #f3f4f6;
+}
+.editToggleBtn:disabled {
+  opacity: 0.6;
+  cursor: default;
 }
 
 .form {
