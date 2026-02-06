@@ -28,6 +28,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     useState<boolean>(false);
 
   async function login(login: string, password: string) {
+    sessionStorage.removeItem("user_info");
+    sessionStorage.removeItem("requires_password_change");
+
     const result: IResponse = await doLogin(login, password);
 
     if (result.type === "success") {

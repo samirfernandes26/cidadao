@@ -44,7 +44,6 @@ async function requiresPasswordChangeService(
     );
 
     if (data.status === "success") {
-      sessionStorage.setItem("requires_password_change", "true");
       return true;
     } else {
       throw new Error("Erro ao alterar a senha: " + data.message);

@@ -1,15 +1,21 @@
 "user client";
 
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export function withAuth(req: NextRequest) {
-  const token = req.cookies.get("auth_token")?.value;
+export async function withAuth(req: NextRequest) {
+  const cookieStore = await cookies();
+
+  const allCookies = cookieStore.getAll();
+  const csrfToken = allCookies.find(
+    (c) => c.name === "versasaude_session",
+  )?.value;
 
   //TODO: Vefiricar token
-  // if (!token) {
-  //   const loginUrl = new URL("/auth/login", req.url);
-  //   loginUrl.searchParams.set("next", req.nextUrl.pathname);
-  //   return NextResponse.redirect(loginUrl);
-  // }
+  if (!csrfToken) {
+    const loginUrl = new URL("/auth/login", req.url);
+    loginUrl.searchParams.set("next", req.nextUrl.pathname);
+    return NextResponse.redirect(loginUrl);
+  }
 }
