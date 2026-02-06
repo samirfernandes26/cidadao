@@ -1,4 +1,4 @@
-export const Api_url = "https://ba34-45-70-34-167.ngrok-free.app";
+export const Api_url = "https://d935-45-70-34-167.ngrok-free.app";
 export const Api_baseUrl = `${Api_url}/api`;
 export const Api_login = `${Api_baseUrl}/cidadao/login`;
 export const Api_logout = `${Api_baseUrl}/cidadao/logout`;

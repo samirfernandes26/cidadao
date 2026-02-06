@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import axios, { HttpStatusCode } from "axios";
 
 import { User } from "@/interfaces/auth";
-import { Api_csrf_token, Api_login } from "@/utils/const/const";
+import { Api_login } from "@/utils/const/const";
 
 interface LoginResponse {
   token: string;
@@ -50,19 +50,23 @@ async function login(login: string, password: string): Promise<IResponse> {
     };
   } catch (err) {
     if (axios.isAxiosError(err)) {
-      if (err.status == HttpStatusCode.UnprocessableEntity) {
-        alert("Credenciais inválidas. Tente novamente.");
-      }
+      const status = err.response?.status;
 
-      return {
-        type: "error",
-        message: "Usuário e/ou senha inválidos.",
-      };
+      if (
+        status === HttpStatusCode.UnprocessableEntity ||
+        status === HttpStatusCode.Unauthorized ||
+        status === HttpStatusCode.Forbidden
+      ) {
+        return {
+          type: "error",
+          message: "Credenciais inválidas. Tente novamente.",
+        };
+      }
     }
 
     return {
       type: "error",
-      message: "Ocorreu um erro. Por favor, tente novamente mais tarde.",
+      message: `Ops - Não foi possível entrar agora. Pode tentar novamente em alguns instantes?`,
     };
   }
 }

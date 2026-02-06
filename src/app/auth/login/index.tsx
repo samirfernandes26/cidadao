@@ -35,8 +35,12 @@ export default function LoginIndex() {
 
     try {
       await login(usuario, senha);
-    } catch {
-      setErr("Ocorreu um erro. Por favor, tente novamente mais tarde.");
+    } catch (error) {
+      if (error instanceof Error && error.message) {
+        setErr(error.message);
+      } else {
+        setErr("Ocorreu um erro. Por favor, tente novamente mais tarde.");
+      }
     } finally {
       setLoading(false);
     }
@@ -72,7 +76,6 @@ export default function LoginIndex() {
               className={styles.input}
             />
           </label>
-
           <label className={styles.label}>
             <span className={styles.labelText}>Senha</span>
             <input
@@ -91,15 +94,15 @@ export default function LoginIndex() {
               {showPass ? "Ocultar senha" : "Mostrar senha"}
             </button>
           </label>
-
           {err && <p className={styles.error}>{err}</p>}
-
+          //{" "}
           <div className={styles.forgotRow}>
+            //{" "}
             <Link href="#" className={styles.forgot}>
-              Esqueceu sua senha?
+              // Esqueceu sua senha? //{" "}
             </Link>
+            //{" "}
           </div>
-
           <button type="submit" className={styles.submit} disabled={loading}>
             {loading ? "Entrando..." : "Login"}
           </button>

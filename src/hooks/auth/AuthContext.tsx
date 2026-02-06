@@ -43,7 +43,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setRequiresPasswordChange(!!result.requiresPasswordChange);
       setUser(result.user!);
       setStatus("authenticated");
+      return;
     }
+
+    setStatus("unauthenticated");
+    throw new Error(result.message);
   }
 
   const logout = async () => {
