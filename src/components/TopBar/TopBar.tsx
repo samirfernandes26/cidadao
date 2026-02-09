@@ -8,9 +8,17 @@ import styles from "./style.module.css";
 
 interface TopBarProps {
   titulo: string;
+  action?: {
+    label: string;
+    href: string;
+    ariaLabel?: string;
+    icon?: "back";
+    iconOnly?: boolean;
+    position?: "left" | "right";
+  };
 }
 
-export const TopBar = ({ titulo }: TopBarProps) => {
+export const TopBar = ({ titulo, action }: TopBarProps) => {
   const router = useRouter();
   const pathname = usePathname();
   const hideMarcacoesLink = pathname?.startsWith("/marcacoes");
@@ -18,6 +26,7 @@ export const TopBar = ({ titulo }: TopBarProps) => {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const btnRef = useRef<HTMLButtonElement | null>(null);
+  const actionPosition = action?.position ?? "right";
 
   async function handleLogout() {
     try {
@@ -60,8 +69,38 @@ export const TopBar = ({ titulo }: TopBarProps) => {
   return (
     <header className={styles.topbar}>
       {/* Título */}
-      <div className={styles.logo}>
+      <div
+        className={`${styles.logo} ${action ? styles.logoWithAction : ""}`}
+      >
+        {action && actionPosition === "left" && (
+          <Link
+            href={action.href}
+            className={`${styles.titleAction} ${
+              action.iconOnly ? styles.titleActionIconOnly : ""
+            } ${styles.titleActionLeft}`}
+            aria-label={action.ariaLabel ?? action.label}
+          >
+            {action.icon === "back" ? <BackIcon /> : action.label}
+            {action.iconOnly && (
+              <span className={styles.srOnly}>{action.label}</span>
+            )}
+          </Link>
+        )}
         <h1 className={styles.title}>{titulo}</h1>
+        {action && actionPosition === "right" && (
+          <Link
+            href={action.href}
+            className={`${styles.titleAction} ${
+              action.iconOnly ? styles.titleActionIconOnly : ""
+            }`}
+            aria-label={action.ariaLabel ?? action.label}
+          >
+            {action.icon === "back" ? <BackIcon /> : action.label}
+            {action.iconOnly && (
+              <span className={styles.srOnly}>{action.label}</span>
+            )}
+          </Link>
+        )}
       </div>
 
       {/* Navegação (desktop) */}
@@ -159,6 +198,20 @@ function CloseIcon() {
         stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+function BackIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+      <path
+        d="M15 5l-7 7 7 7"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
       />
     </svg>
   );

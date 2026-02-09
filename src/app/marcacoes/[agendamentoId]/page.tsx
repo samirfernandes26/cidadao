@@ -24,7 +24,16 @@ export default function Page() {
 
   return (
     <>
-      <TopBar titulo="Detalhes da marcação" />
+      <TopBar
+        titulo="Detalhes da marcação"
+        action={{
+          label: "Voltar",
+          href: "/marcacoes",
+          icon: "back",
+          iconOnly: true,
+          position: "left",
+        }}
+      />
       <div className="min-h-[60vh] bg-slate-50">
         <MarcacaoDetalhe marcacao={marcacao} />
       </div>

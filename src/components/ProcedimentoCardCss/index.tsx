@@ -4,12 +4,14 @@ import Link from "next/link";
 import React from "react";
 import type { Procedimento } from "@/interfaces";
 import styles from "./ProcedimentoCardCss.module.css";
+import estetoscopioIcon from "@/assets/icons/estetoscopio.svg";
 
 type Props = {
   data: Procedimento;
   detalhesHref?: string; // quando vier, o card inteiro vira Link
   onDetalhesClick?: () => void;
   className?: string;
+  nomeCard: string | null;
 };
 
 // Mapeia rótulo de risco -> classe CSS do módulo
@@ -29,6 +31,7 @@ export default function ProcedimentoCard({
   detalhesHref,
   onDetalhesClick,
   className = "",
+  nomeCard,
 }: Props) {
   const { titulo, risco, statusLinha1, posicao, hospital } = data;
 
@@ -45,21 +48,20 @@ export default function ProcedimentoCard({
     <div className={styles.row}>
       {/* Ícone */}
       <div className={styles.iconWrap}>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-          <path
-            d="M5 8v5a4 4 0 0 0 8 0V6"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
-          <circle cx="17" cy="5" r="2" stroke="currentColor" strokeWidth="2" />
-        </svg>
+        <span
+          className={styles.iconMask}
+          aria-hidden="true"
+          style={{
+            WebkitMaskImage: `url(${estetoscopioIcon.src})`,
+            maskImage: `url(${estetoscopioIcon.src})`,
+          }}
+        />
       </div>
 
       {/* Conteúdo */}
       <div className={styles.header}>
         <div className={styles.headerTop}>
-          <h3 className={styles.title}>{titulo}</h3>
+          <h3 className={styles.title}>{nomeCard ?? titulo}</h3>
           <div className={styles.badgeWrap}>{RiskBadge}</div>
         </div>
 

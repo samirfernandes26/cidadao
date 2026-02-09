@@ -34,6 +34,9 @@
   display: flex;
   align-items: center;
 }
+.logoWithAction {
+  gap: 0.75rem;
+}
 
 /* Título fluido */
 .title {
@@ -42,6 +45,52 @@
   color: var(--text-on-topbar);
   font-size: clamp(1.125rem, 1rem + 1.5vw, 1.75rem);
   line-height: 1.2;
+}
+.titleAction {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid rgb(255 255 255 / 0.55);
+  color: var(--text-on-topbar);
+  text-decoration: none;
+  font-size: clamp(0.75rem, 0.7rem + 0.4vw, 0.9rem);
+  font-weight: 600;
+  line-height: 1;
+  background: rgb(255 255 255 / 0.12);
+  transition:
+    background 0.15s ease,
+    transform 0.15s ease;
+}
+.titleActionIconOnly {
+  padding: 0;
+  width: 2rem;
+  height: 2rem;
+  justify-content: center;
+  border-radius: 999px;
+}
+.titleAction:hover {
+  background: rgb(255 255 255 / 0.2);
+}
+.titleAction:active {
+  transform: translateY(1px);
+}
+.titleAction:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+.titleActionLeft {
+}
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* ====== Navegação (desktop) ====== */
@@ -158,12 +207,21 @@
   }
   .logo {
     position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 0;
+    right: 0;
+    transform: none;
+    justify-content: center;
+    padding: 0 3rem;
   }
   .menuBtn {
     position: absolute;
     right: clamp(0.75rem, 2.5vw, 1rem);
+  }
+  .titleActionLeft {
+    position: absolute;
+    left: clamp(0.75rem, 2.5vw, 1rem);
+    top: 50%;
+    transform: translateY(-50%);
   }
 
   /* tipografia menor no mobile (opcional) */

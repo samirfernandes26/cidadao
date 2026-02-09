@@ -11,8 +11,13 @@ import PrestadorServico from "../Sections/PrestadorServico/prestadorServico";
 
 export default function MarcacaoDetalhe({ marcacao }: { marcacao: Marcacao }) {
   const router = useRouter();
+  const tituloMarcacao = marcacao?.nome_card?.trim() || "Marcação";
   return (
     <div className={styles.container}>
+      <div className={styles.headerRow}>
+        <h2 className={styles.titulo}>{tituloMarcacao}</h2>
+      </div>
+
       <Section title="Informações Básicas">
         <InformacoesBasicas marcacao={marcacao} />
       </Section>

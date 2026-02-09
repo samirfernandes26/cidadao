@@ -46,6 +46,7 @@ export type Procedimento = {
 };
 
 export type Marcacao = {
+  nome_card: string | null;
   agendamento_id: number;
   data_admissao: string; // ISO-8601 (UTC) vindo da API
   classificacao_de_risco: ClassificacaoDeRisco;

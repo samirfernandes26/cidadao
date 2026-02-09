@@ -80,6 +80,18 @@
   color: var(--blue-600);
   background: #fff;
 }
+.iconMask {
+  display: block;
+  width: 24px;
+  height: 24px;
+  background-color: currentColor;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-position: center;
+  mask-position: center;
+}
 
 .header {
   min-width: 0;

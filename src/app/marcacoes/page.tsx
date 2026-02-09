@@ -106,6 +106,7 @@ export default function Dashboard() {
               <ProcedimentoCard
                 key={m.agendamento_id}
                 data={toCardData(m)}
+                nomeCard={m.nome_card}
                 onDetalhesClick={() => {
                   salvarMarcacaoSession(m);
                   router.push(`/marcacoes/${m.agendamento_id}`);
