@@ -2,7 +2,7 @@
 
 import { cookies } from "next/headers";
 import axios from "axios";
-import { Api_logout, Api_marcacoes } from "@/utils/const/const";
+import { Api_logout } from "@/utils/const/const";
 import getApiCsrfTokemService from "./get_csrf_tokem_service";
 import { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
 
@@ -35,6 +35,11 @@ export async function logoutService(): Promise<void | { message: string }> {
         withCredentials: true,
       },
     );
+
+    // Remove cookies locais da aplicação após logout bem-sucedido
+    allCookies.forEach((cookie) => {
+      cookieStore.delete(cookie.name);
+    });
 
     return data;
   } catch (error: unknown) {

@@ -28,19 +28,33 @@ export const TopBar = ({ titulo, action }: TopBarProps) => {
   const btnRef = useRef<HTMLButtonElement | null>(null);
   const actionPosition = action?.position ?? "right";
 
+  function clearClientStorage() {
+    if (typeof window === "undefined") return;
+    try {
+      sessionStorage.clear();
+    } catch (error) {
+      console.warn("Falha ao limpar sessionStorage:", error);
+    }
+    try {
+      document.cookie.split(";").forEach((cookie) => {
+        const name = cookie.split("=")[0]?.trim();
+        if (!name) return;
+        document.cookie = `${name}=; Max-Age=0; path=/`;
+      });
+    } catch (error) {
+      console.warn("Falha ao limpar cookies no cliente:", error);
+    }
+  }
+
   async function handleLogout() {
     try {
-      const response = await logoutService();
-      if (typeof window !== "undefined") {
-        sessionStorage.clear();
-      }
-      if (response) {
-        router.replace("/auth/login");
-      } else {
-        alert("Erro ao sair. Tente novamente.");
-      }
+      await logoutService();
+      router.replace("/auth/login");
     } catch (error: unknown) {
       alert("Erro ao sair. Tente novamente. " + (error as Error)?.message);
+    } finally {
+      // Por último, limpa sessionStorage e cookies no cliente
+      clearClientStorage();
     }
   }
 

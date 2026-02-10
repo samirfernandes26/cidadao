@@ -10,18 +10,21 @@ import { useAuth } from "@/hooks/auth";
 export default function LoginIndex() {
   const router = useRouter();
   const params = useSearchParams();
-  const { login, user } = useAuth(); // ⬅️ vai salvar o user no sessionStorage + estado
+  const { login, status, requiresPasswordChange } = useAuth(); // ⬅️ vai salvar o user no sessionStorage + estado
 
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!!user?.cidadao_id) {
-      const next = params.get("next") || "/marcacoes";
-      router.push(next);
+    if (status !== "authenticated") return;
+    if (requiresPasswordChange) {
+      router.replace("/auth/atualizar-senha");
+      return;
     }
-  }, [user, router, params]);
+    const next = params.get("next") || "/marcacoes";
+    router.replace(next);
+  }, [status, requiresPasswordChange, router, params]);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
